@@ -3,10 +3,6 @@
 
 #include "configuration.h"
 
-const uint8_t ON_OR_OFF_PIN = 8;
-
-const char CONTROLLER_TYPE[] = "ON_OR_OFF";
-
 void flash() {
   digitalWrite(LED_BUILTIN, LOW);
   delay(100);
@@ -14,12 +10,8 @@ void flash() {
   delay(100);
 }
 
-const String THIS_CONTROLLERS_STATE_REQUESTED_TOPIC = "/request_device_state/"
-                                                    + String(CONTROLLER_ID) + "/";
 const char ALL_CONTROLLERS_STATE_REQUESTED_TOPIC[]  = "/request_devices_state/";
 const char SEND_THIS_CONTROLLERS_DATA_TOPIC[]       = "/receive_device_state/";
-const String NEW_DATA_RECEIVED_TOPIC                = "/" + String(CONTROLLER_TYPE) +
-                                                      "/" + String(CONTROLLER_ID) + "/";
 
 const uint8_t D0   = 16;
 const uint8_t D1   = 5;
@@ -30,5 +22,16 @@ const uint8_t D5   = 14;
 const uint8_t D6   = 12;
 const uint8_t D7   = 13;
 const uint8_t D8   = 15;
+
+const char CONTROLLER_TYPE[] = "ON_OR_OFF";
+
+const String THIS_CONTROLLERS_STATE_REQUESTED_TOPIC = "/request_device_state/" +
+                                                      String(CONTROLLER_ID) + "/";
+const String NEW_DATA_RECEIVED_TOPIC                = "/" + String(CONTROLLER_TYPE) +
+                                                      "/" + String(CONTROLLER_ID) + "/";
+
+const uint8_t ON_OR_OFF_PIN = 8;
+
+
 
 #endif

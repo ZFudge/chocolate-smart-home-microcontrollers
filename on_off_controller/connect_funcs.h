@@ -5,6 +5,7 @@
 #include <PubSubClient.h>
 
 #include "consts.h"
+#include "mqtt_funcs.h"
 
 void setup_wifi() {
   delay(10);
@@ -25,31 +26,31 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-void connect_mqtt_broker(PubSubClient& client, void (*publish)()) {
-  while (!client.connected()) {
+void connect_mqtt_broker() {
+  while (!mqtt_client.connected()) {
     Serial.print("Attempting MQTT connection on port ");
     Serial.print(MQTT_PORT);
     Serial.println("...");
     digitalWrite(LED_BUILTIN, LOW);
-    if (client.connect(CONTROLLER_NAME.c_str())) {
+    if (mqtt_client.connect(controller.name.c_str())) {
       Serial.println("Connected!");
       Serial.print("Subscribing to ");
-      Serial.print(NEW_DATA_RECEIVED_TOPIC + ", ");
-      Serial.print(THIS_CONTROLLERS_STATE_REQUESTED_TOPIC + ", and ");
-      Serial.println(ALL_CONTROLLERS_STATE_REQUESTED_TOPIC);
+      Serial.print(controller.newDataReceivedTopic + ", ");
+      Serial.print(controller.stateRequestedTopic + ", and ");
+      Serial.println(ALL_CONTROLLERS_STATES_REQUESTED_TOPIC);
       for (byte i = 0; i < 5; i++) {
         flash();
         delay(i * 100);
       }
-      client.subscribe(NEW_DATA_RECEIVED_TOPIC.c_str());
-      client.subscribe(THIS_CONTROLLERS_STATE_REQUESTED_TOPIC.c_str());
-      client.subscribe(ALL_CONTROLLERS_STATE_REQUESTED_TOPIC);
+      mqtt_client.subscribe(controller.newDataReceivedTopic.c_str());
+      mqtt_client.subscribe(controller.stateRequestedTopic.c_str());
+      mqtt_client.subscribe(ALL_CONTROLLERS_STATES_REQUESTED_TOPIC);
       Serial.println("Subscribed!");
       Serial.println("Attempting initial publish...");
-      publish();
+      publishEspState();
     } else {
       Serial.print("failed, rc=");
-      Serial.print(client.state());
+      Serial.print(mqtt_client.state());
       Serial.println(" trying again in a few seconds...");
       flash();
       digitalWrite(LED_BUILTIN, HIGH);

@@ -5,26 +5,28 @@
 #include <PubSubClient.h>
 
 #include "consts.h"
+#include "controller_data.h"
 #include "state_values.h"
 #include "turn_on_or_off.h"
 
 WiFiClient espClient;
 PubSubClient mqtt_client(espClient);
 
-void publishEspStateOnOrOff() {
-  String message = (
-    String(CONTROLLER_TYPE) + ',' +
-    String(CONTROLLER_ID) + ',' +
-    String(CONTROLLER_NAME) + ',' +
-    String(onOrOff)
-  );
+ControllerData controller;
+
+
+void publishEspState() {
+  const String message = controller.getStateMessage();
 
   Serial.print("Publishing: ");
   Serial.println(message);
   Serial.print("To topic: ");
   Serial.println(SEND_THIS_CONTROLLERS_DATA_TOPIC);
   Serial.println(
-    mqtt_client.publish(SEND_THIS_CONTROLLERS_DATA_TOPIC, String(message).c_str())
+    mqtt_client.publish(
+      SEND_THIS_CONTROLLERS_DATA_TOPIC,
+      String(message).c_str()
+    )
     ? "Success!" : "FAILED!"
   );
 }
@@ -35,9 +37,9 @@ void handleMqttMsgReceived(String topic, byte* message, unsigned int length) {
   Serial.print("Message arrived on topic: ");
   Serial.println(topic);
 
-  if (topic == THIS_CONTROLLERS_STATE_REQUESTED_TOPIC ||
-      topic == ALL_CONTROLLERS_STATE_REQUESTED_TOPIC)
-    return publishEspStateOnOrOff();
+  if (topic == controller.stateRequestedTopic ||
+      topic == ALL_CONTROLLERS_STATES_REQUESTED_TOPIC)
+    return publishEspState();
 
   String messageTemp;
   Serial.print("Message: ");
@@ -57,7 +59,12 @@ void handleMqttMsgReceived(String topic, byte* message, unsigned int length) {
     Serial.print("OFF");
     turnOnOrOff(false);
   }
-  publishEspStateOnOrOff();
+  publishEspState();
+}
+
+void init_mqtt_broker() {
+  mqtt_client.setServer(MQTT_SERVER, MQTT_PORT);
+  mqtt_client.setCallback(handleMqttMsgReceived);
 }
 
 #endif

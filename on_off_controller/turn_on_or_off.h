@@ -5,6 +5,7 @@
 #include "state_values.h"
 
 void turnOnOrOff(bool newOnOrOff) {
+  Serial.print(newOnOrOff ? "ON" : "OFF");
   if (newOnOrOff == onOrOff) return;
   onOrOff = newOnOrOff;
   digitalWrite(ON_OR_OFF_PIN, onOrOff);

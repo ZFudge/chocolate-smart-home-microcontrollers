@@ -1,18 +1,7 @@
-#include "connect_funcs.h"
+#include "configuration.h"
+#include "consts.h"
+#include "data_funcs.h"
 
-#include "mqtt_funcs.h"
-
-const uint8_t MQTT_ID = 123;
-const String  NAME = "Test";
-
-String getStateMessage() {
-  return (
-    String(CONTROLLER_TYPE) + ',' +
-    String(MQTT_ID) + ',' +
-    String(NAME) + ',' +
-    String(onOrOff)
-  );
-}
 
 void setup() {
   Serial.begin(115200);
@@ -20,17 +9,17 @@ void setup() {
   Serial.print(CONTROLLER_TYPE);
   Serial.println(" ESP /w CTRLR ID: ");
   Serial.print(MQTT_ID);
-  Serial.println(" & CTRLR NAME: " + NAME);
+  Serial.println(" & CTRLR NAME: " + controller.name);
 
   randomSeed(analogRead(0));
   pinMode(LED_BUILTIN, OUTPUT);
   controller.init(CONTROLLER_TYPE, MQTT_ID, NAME, getStateMessage);
   setup_wifi();
-  init_mqtt_broker();
+  init_mqtt_broker(handleMqttMsgReceivedOnOff, MQTT_SERVER, MQTT_PORT);
   // pinMode(ON_OR_OFF_PIN, OUTPUT);
 }
 
 void loop() {
-  if (!mqtt_client.connected()) connect_mqtt_broker();
+  if (!mqtt_client.connected()) connect_mqtt_broker(MQTT_PORT, MQTT_SERVER);
   mqtt_client.loop();
 }

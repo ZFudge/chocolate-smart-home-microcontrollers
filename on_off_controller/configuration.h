@@ -1,11 +1,10 @@
 #ifndef CONFIGURATION_H_
 #define CONFIGURATION_H_
 
-#define DEFAULT_MQTT_PORT 1883
-#define MQTT_PORT 1883
+const uint8_t MQTT_ID = 123;
+const String  NAME    = "Test";
 
-const char* MQTT_SERVER = "";
-const char* ssid = "";
-const char* password = "";
+char MQTT_SERVER[] = "";
+#define MQTT_PORT 1883
 
 #endif

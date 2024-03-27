@@ -7,9 +7,9 @@
 #include "consts.h"
 #include "turn_on_or_off.h"
 
-String getStateMessage() {
-  return (String(CONTROLLER_TYPE) + ',' + String(MQTT_ID) + ',' +
-          String(controller.name) + ',' + String(onOrOff));
+
+String getStateMessageTypeImplementation() {
+  return String(onOrOff);
 }
 
 void processNewData(String message) {

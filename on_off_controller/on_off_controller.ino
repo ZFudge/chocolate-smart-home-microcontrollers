@@ -5,7 +5,12 @@
 void setup() {
   Serial.begin(115200);
 
-  controller.init(CONTROLLER_TYPE, MQTT_ID, NAME, getStateMessage);
+  controller.init(
+    MQTT_ID,
+    CONTROLLER_TYPE,
+    NAME,
+    getStateMessageTypeImplementation
+  );
 
   setup_wifi();
 

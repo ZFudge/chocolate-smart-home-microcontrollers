@@ -1,8 +1,6 @@
 #ifndef DUPLEX_MESSENGER_H_
 #define DUPLEX_MESSENGER_H_
 
-#include "Chocolate_Smart_Home_ESP_Connect.h"
-
 #include "configuration.h"
 #include "consts.h"
 #include "on_off_controller.h"

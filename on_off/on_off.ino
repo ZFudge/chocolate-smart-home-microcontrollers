@@ -1,3 +1,5 @@
+#include <Chocolate_Smart_Home_ESP_Connect.h>
+
 #include "configuration.h"
 #include "consts.h"
 #include "duplex_messenger.h"
@@ -6,15 +8,16 @@
 void setup() {
     Serial.begin(115200);
 
-    controller_CSM.setGetControllerState(getControllerState);
-    controller_CSM.setProcessMsgForController(processOnOffMsg);
-    controller_CSM.setMQTTId(MQTT_ID);
-    controller_CSM.setControllerType(CONTROLLER_TYPE);
-    controller_CSM.init(NAME);
+    CsmEspConn::controller.setGetState(getControllerState);
+    CsmEspConn::controller.setProcessMsgReceived(processOnOffMsg);
+    
+    CsmEspConn::controller.setMQTTId(MQTT_ID);
+    CsmEspConn::controller.setType(CONTROLLER_TYPE);
+    CsmEspConn::controller.init(NAME);
 
-    connect_WIFI_CSM();
+    CsmEspConn::connect_WIFI();
 
-    set_mqtt_server_host_and_port_CSM(MQTT_SERVER, MQTT_PORT);
+    CsmEspConn::set_mqtt_server_host_and_port(MQTT_SERVER, MQTT_PORT);
 
     pinMode(LED_BUILTIN, OUTPUT);
     // pinMode(ON_OFF_PIN, OUTPUT);
@@ -22,6 +25,7 @@ void setup() {
 
 
 void loop() {
-    if (!mqtt_client_CSM.connected()) connect_MQTT_CSM();
-    mqtt_client_CSM.loop();
+    if (!CsmEspConn::mqtt_client.connected())
+        CsmEspConn::connect_MQTT();
+    CsmEspConn::mqtt_client.loop();
 }

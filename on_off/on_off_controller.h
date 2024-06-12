@@ -1,17 +1,15 @@
-#ifndef ON_OFF_CONTROLLER_H_
-#define ON_OFF_CONTROLLER_H_
+#ifndef ON_OFF_CONTROLLER_H
+#define ON_OFF_CONTROLLER_H
 
 #include "consts.h"
 
 
 struct OnOffController {
-    bool onOff = false;
+    bool on = false;
 
-    void turnOnOrOff(bool newOnOff) {
-        Serial.print(newOnOff ? "ON" : "OFF");
-        if (newOnOff == onOff) return;
-        onOff = newOnOff;
-        digitalWrite(ON_OFF_PIN, onOff);
+    void turnOnOrOff(bool newOn) {
+        on = newOn;
+        digitalWrite(ON_OFF_PIN, on);
     }
 };
 

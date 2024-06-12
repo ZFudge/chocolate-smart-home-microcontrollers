@@ -7,7 +7,7 @@
 
 String getControllerState() {
     /* Return the controller"s state in a format expected by the CSM server */
-    return String(on_off_controller.onOff);
+    return String(on_off_controller.on);
 }
 
 void processOnOffMsg(String message) {

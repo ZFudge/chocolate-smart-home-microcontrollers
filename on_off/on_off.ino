@@ -1,8 +1,6 @@
 #include <Chocolate_Smart_Home_ESP_Connect.h>
 
-#include "configuration.h"
-#include "consts.h"
-#include "duplex_messenger.h"
+#include "on_off.h"
 
 
 void setup() {

@@ -8,5 +8,6 @@
 namespace OnOff {
 #include "on_off/on_off.h"
 }
+#include "neopixel/neopixel.h"
 
 #endif

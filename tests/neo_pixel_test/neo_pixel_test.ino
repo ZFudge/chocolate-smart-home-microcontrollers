@@ -3,7 +3,7 @@
 #include <AUnitVerbose.h>
 #include <chocolate-smart-home-microcontrollers.h>
 
-using namespace Neopixel;
+using namespace NeoPixel;
 
 
 #define TEST_DATA_PIN   6
@@ -13,7 +13,7 @@ using namespace Neopixel;
 NeoPixelController *test_controller;
 
 
-class NeopixelDefaultSettings: public aunit::TestOnce {
+class NeoPixelDefaultSettings: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -27,30 +27,30 @@ protected:
 };
 
 
-testF(NeopixelDefaultSettings, test_getPin) {
+testF(NeoPixelDefaultSettings, test_getPin) {
     const byte pin = test_controller->strip.getPin();
     assertEqual(pin, TEST_DATA_PIN);
 }
 
 
-testF(NeopixelDefaultSettings, test_numPixels) {
+testF(NeoPixelDefaultSettings, test_numPixels) {
     const byte numPixels = test_controller->strip.numPixels();
     assertEqual(numPixels, TEST_NUM_PIX);
 }
 
 
-testF(NeopixelDefaultSettings, test_on) {
+testF(NeoPixelDefaultSettings, test_on) {
     assertTrue(test_controller->on);
 }
 
 
-testF(NeopixelDefaultSettings, test_turn_off) {
+testF(NeoPixelDefaultSettings, test_turn_off) {
     test_controller->turnOnOff(false);
     assertFalse(test_controller->on);
 }
 
 
-class NeopixelOff: public aunit::TestOnce {
+class NeoPixelOff: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -65,12 +65,12 @@ protected:
 };
 
 
-testF(NeopixelOff, test_off) {
+testF(NeoPixelOff, test_off) {
     assertFalse(test_controller->on);
 }
 
 
-testF(NeopixelOff, test_turn_on) {
+testF(NeoPixelOff, test_turn_on) {
     test_controller->turnOnOff(true);
     assertTrue(test_controller->on);
 }

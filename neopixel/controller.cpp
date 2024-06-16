@@ -1,7 +1,7 @@
 #include "controller.h"
 
 
-void Neopixel::NeoPixelController::init(byte dataPin, byte numOfPixels) {
+void NeoPixel::NeoPixelController::init(byte dataPin, byte numOfPixels) {
     Serial.println("Initializing...");
 
     strip.setPin(dataPin);

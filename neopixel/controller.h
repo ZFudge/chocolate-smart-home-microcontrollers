@@ -5,7 +5,7 @@
 
 #include "pixel.h"
 
-namespace Neopixel {
+namespace NeoPixel {
 struct NeoPixelController : public Adafruit_NeoPixel {
     Adafruit_NeoPixel strip = Adafruit_NeoPixel();
     Pixel* pixels = NULL;

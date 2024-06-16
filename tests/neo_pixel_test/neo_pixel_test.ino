@@ -44,6 +44,38 @@ testF(NeopixelDefaultSettings, test_on) {
 }
 
 
+testF(NeopixelDefaultSettings, test_turn_off) {
+    test_controller->turnOnOff(false);
+    assertFalse(test_controller->on);
+}
+
+
+class NeopixelOff: public aunit::TestOnce {
+protected:
+    void setup() override {
+        aunit::TestOnce::setup();
+        test_controller = new NeoPixelController;
+        test_controller->init(TEST_DATA_PIN, TEST_NUM_PIX);
+        test_controller->turnOnOff(false);
+    }
+
+    void teardown() override {
+        aunit::TestOnce::teardown();
+    }
+};
+
+
+testF(NeopixelOff, test_off) {
+    assertFalse(test_controller->on);
+}
+
+
+testF(NeopixelOff, test_turn_on) {
+    test_controller->turnOnOff(true);
+    assertTrue(test_controller->on);
+}
+
+
 void setup() {
     Serial.begin(115200);
 #if defined(EPOXY_DUINO)

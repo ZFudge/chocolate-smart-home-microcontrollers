@@ -10,18 +10,37 @@ using namespace Neopixel;
 #define TEST_NUM_PIX    10
 
 
-NeoPixelController test_controller;
+NeoPixelController *test_controller;
 
 
-test(test_numPixels) {
-    const byte numPixels = test_controller.strip.numPixels();
+class NeopixelDefaultSettings: public aunit::TestOnce {
+protected:
+    void setup() override {
+        aunit::TestOnce::setup();
+        test_controller = new NeoPixelController;
+        test_controller->init(TEST_DATA_PIN, TEST_NUM_PIX);
+    }
+
+    void teardown() override {
+        aunit::TestOnce::teardown();
+    }
+};
+
+
+testF(NeopixelDefaultSettings, test_getPin) {
+    const byte pin = test_controller->strip.getPin();
+    assertEqual(pin, TEST_DATA_PIN);
+}
+
+
+testF(NeopixelDefaultSettings, test_numPixels) {
+    const byte numPixels = test_controller->strip.numPixels();
     assertEqual(numPixels, TEST_NUM_PIX);
 }
 
 
-test(test_getPin) {
-    const byte pin = test_controller.strip.getPin();
-    assertEqual(pin, TEST_DATA_PIN);
+testF(NeopixelDefaultSettings, test_on) {
+    assertTrue(test_controller->on);
 }
 
 
@@ -30,7 +49,6 @@ void setup() {
 #if defined(EPOXY_DUINO)
     Serial.setLineModeUnix();
 #endif
-    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
 }
 
 

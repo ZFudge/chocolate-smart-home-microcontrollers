@@ -11,6 +11,7 @@ struct NeoPixelController : public Adafruit_NeoPixel {
     Pixel* pixels = NULL;
 
     byte numOfPixels;
+    bool on = true;
 
     void init(byte dataPin, byte numOfPixels);
 };

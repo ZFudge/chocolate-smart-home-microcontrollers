@@ -1,7 +1,8 @@
-#line 2 "neopixel_test.ino"
+#line 2 "on_test.ino"
 
 #include <AUnitVerbose.h>
 #include <chocolate-smart-home-microcontrollers.h>
+
 
 using namespace NeoPixel;
 
@@ -13,7 +14,7 @@ using namespace NeoPixel;
 NeoPixelController *test_controller;
 
 
-class NeoPixelDefaultSettings: public aunit::TestOnce {
+class NeopixelDefaults: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -27,24 +28,24 @@ protected:
 };
 
 
-testF(NeoPixelDefaultSettings, test_getPin) {
+testF(NeopixelDefaults, test_getPin) {
     const byte pin = test_controller->strip.getPin();
     assertEqual(pin, TEST_DATA_PIN);
 }
 
 
-testF(NeoPixelDefaultSettings, test_numPixels) {
+testF(NeopixelDefaults, test_numPixels) {
     const byte numPixels = test_controller->strip.numPixels();
     assertEqual(numPixels, TEST_NUM_PIX);
 }
 
 
-testF(NeoPixelDefaultSettings, test_on) {
+testF(NeopixelDefaults, test_on) {
     assertTrue(test_controller->on);
 }
 
 
-testF(NeoPixelDefaultSettings, test_turn_off) {
+testF(NeopixelDefaults, test_turn_off) {
     test_controller->turnOnOff(false);
     assertFalse(test_controller->on);
 }

@@ -12,10 +12,14 @@ struct NeoPixelController : public Adafruit_NeoPixel {
 
     byte numOfPixels;
     bool on = true;
+    byte brightness = 255;
 
     void init(byte dataPin, byte numOfPixels);
     void turnOnOff(const bool on) {
         this->on = on;
+    };
+    void setBrightness(const byte brightness) {
+        this->brightness = brightness;
     };
 };
 }

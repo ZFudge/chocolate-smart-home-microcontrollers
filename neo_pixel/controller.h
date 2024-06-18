@@ -12,6 +12,7 @@ struct NeoPixelController : public Adafruit_NeoPixel {
 
     byte numOfPixels;
     bool on = true;
+    bool twinkle = true;
     byte brightness = 255;
 
     void init(byte dataPin, byte numOfPixels);
@@ -20,6 +21,9 @@ struct NeoPixelController : public Adafruit_NeoPixel {
     };
     void setBrightness(const byte brightness) {
         this->brightness = brightness;
+    };
+    void setTwinkle(const bool twinkle) {
+        this->twinkle = twinkle;
     };
 };
 }

@@ -3,9 +3,11 @@
 
 #include <Adafruit_NeoPixel.h>
 
-#include "pixel.h"
+#include "pixel.cpp"
 
 namespace NeoPixel {
+
+
 struct NeoPixelController : public Adafruit_NeoPixel {
     Adafruit_NeoPixel strip = Adafruit_NeoPixel();
     Pixel* pixels = NULL;
@@ -17,6 +19,7 @@ struct NeoPixelController : public Adafruit_NeoPixel {
 
     void init(byte dataPin, byte numOfPixels);
     void loop();
+
     void turnOnOff(const bool on) {
         this->on = on;
     };
@@ -27,6 +30,7 @@ struct NeoPixelController : public Adafruit_NeoPixel {
         this->twinkle = twinkle;
     };
 };
+
 }
 
 #endif

@@ -3,11 +3,10 @@
 #include <AUnitVerbose.h>
 #include <chocolate-smart-home-microcontrollers.h>
 
+#define TEST_DATA_PIN   6
+
 
 using namespace NeoPixel;
-
-
-#define TEST_DATA_PIN   6
 
 
 NeoPixelController *test_controller;
@@ -20,7 +19,7 @@ protected:
         test_controller = new NeoPixelController;
         test_controller->init(TEST_DATA_PIN, 1);
         Pixel *pixel = &test_controller->pixels[0];
-        pixel->setTargetBrightness(100);
+        pixel->setTargetBrightness(255);
     }
 
     void teardown() override {
@@ -40,17 +39,23 @@ testF(NeopixelSinglePixel, test_setTwinkle_false) {
 }
 
 
-testF(NeopixelSinglePixel, test_twinkle_loop) {
+testF(NeopixelSinglePixel, test_twinkle_loop_brightness_up) {
     Pixel *pixel = &test_controller->pixels[0];
 
     assertEqual(pixel->brightness, 0);
-    assertEqual(pixel->targetBrightness, 100);
+    assertEqual(pixel->targetBrightness, 255);
 
-    for (byte i = 0; i < 20; i++) {
+    for (byte i = 0; i < 255; i++) {
         assertEqual(pixel->brightness, i);
+        assertEqual(pixel->targetBrightness, 255);
         test_controller->loop();
     }
-    assertEqual(pixel->brightness, 20);
+
+    // brightness and targetBrightness only compared at start of loop()
+    assertEqual(pixel->brightness, 255);
+    assertEqual(pixel->targetBrightness, 255);
+    test_controller->loop();
+    assertNotEqual(pixel->targetBrightness, 255);
 }
 
 
@@ -62,7 +67,6 @@ protected:
         test_controller->init(TEST_DATA_PIN, 1);
         Pixel *pixel = &test_controller->pixels[0];
         pixel->brightness = 255;
-        pixel->setTargetBrightness(200);
     }
 
     void teardown() override {
@@ -71,20 +75,24 @@ protected:
 };
 
 
-testF(NeopixelSinglePixelBright, test_twinkle_loop) {
+testF(NeopixelSinglePixelBright, test_twinkle_loop_brightness_down) {
     Pixel *pixel = &test_controller->pixels[0];
 
-    for (byte i = 255; i > 200; i--) {
+    assertEqual(pixel->brightness, 255);
+    assertEqual(pixel->targetBrightness, 0);
+
+    for (byte i = 255; i > 0; i--) {
         assertEqual(pixel->brightness, i);
+        assertEqual(pixel->targetBrightness, 0);
         test_controller->loop();
     }
-    assertEqual(pixel->brightness, 200);
-    assertEqual(pixel->targetBrightness, 200);
 
+    // brightness and targetBrightness only compared at start of loop()
+    assertEqual(pixel->brightness, 0);
+    assertEqual(pixel->targetBrightness, 0);
     test_controller->loop();
-    assertNotEqual(pixel->targetBrightness, 200);
+    assertNotEqual(pixel->targetBrightness, 0);
 }
-
 
 void setup() {
     Serial.begin(115200);

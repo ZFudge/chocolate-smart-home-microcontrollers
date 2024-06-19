@@ -2,11 +2,9 @@
 #define RGBS_H
 
 const byte NUM_COLORS = 9;
-const byte MAX_PALETTES = 2;
 
 // Default "Outrun" palette
-byte rgbs[MAX_PALETTES][NUM_COLORS][3] = {
-  {
+byte rgbs[NUM_COLORS][3] = {
     { 0, 255, 255 },    // cyan
     { 3, 148, 252 },    // turquoise
     { 3, 65, 252 },     // blue 1
@@ -16,7 +14,6 @@ byte rgbs[MAX_PALETTES][NUM_COLORS][3] = {
     { 186, 3, 252 },    // pink 1
     { 222, 25, 255 },   // pink 2
     { 252, 3, 165 },    // ruby
-  },
 };
 
 #endif

@@ -18,9 +18,7 @@ void NeoPixel::NeoPixelController::loop() {
         Pixel *pixel = &pixels[i];
 
         if (twinkle) {
-            while (pixel->brightness == pixel->targetBrightness)
-                pixel->setTargetBrightness(10, brightness);
-            pixel->incrementBrightness();
+            pixel->twinkle(brightness);
         }
     }
 }

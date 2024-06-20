@@ -12,19 +12,24 @@ struct Pixel {
     byte targetBrightness;
     byte brightness;
 
+    void twinkle(byte maxBrightness);
+
+    void setColorRandom();
+    void setColorRandomAny();
+
+    Pixel() {
+        setColorRandomAny();
+    }
+
     void setTargetBrightness(byte minBrightness, byte maxBrightness) {
         this->targetBrightness = random(minBrightness, maxBrightness);
     }
     void setTargetBrightness(byte targetBrightness) {
         this->targetBrightness = targetBrightness;
     }
+
     void incrementBrightness() {
         this->brightness += brightness < targetBrightness ? 1 : -1;
-    }
-    void twinkle(byte maxBrightness);
-    void setColorRandom();
-    Pixel() {
-        setColorRandom();
     }
 };
 

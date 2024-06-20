@@ -1,4 +1,4 @@
-#line 2 "twinkle_test.ino"
+#line 2 "pixel_test.ino"
 
 #include <AUnitVerbose.h>
 #include <chocolate-smart-home-microcontrollers.h>
@@ -112,11 +112,15 @@ testF(TestPixelMutable, test_pixel_mutate_brightness) {
 
 
 testF(TestPixelMutable, test_pixel_mutate_color) {
+    assertEqual(test_pixel->r, 0);
+    assertEqual(test_pixel->g, 127);
+    assertEqual(test_pixel->b, 255);
     test_pixel->twinkle(55);
     assertNotEqual(test_pixel->colorIndex, 0);
     assertEqual(test_pixel->r, 77);
     assertEqual(test_pixel->g, 77);
     assertEqual(test_pixel->b, 77);
+    assertLess(test_pixel->targetBrightness, 55);
 }
 
 

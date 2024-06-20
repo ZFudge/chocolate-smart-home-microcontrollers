@@ -8,7 +8,7 @@ void setup() {
 
     CsmEspConn::controller.setGetState(getControllerState);
     CsmEspConn::controller.setProcessMsgReceived(processOnOffMsg);
-    
+
     CsmEspConn::controller.setMQTTId(MQTT_ID);
     CsmEspConn::controller.setType(CONTROLLER_TYPE);
     CsmEspConn::controller.init(NAME);

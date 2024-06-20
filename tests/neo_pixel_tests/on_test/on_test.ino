@@ -14,7 +14,7 @@ using namespace NeoPixel;
 NeoPixelController *test_controller;
 
 
-class NeopixelDefaults: public aunit::TestOnce {
+class NeoPixelDefaults: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -28,24 +28,24 @@ protected:
 };
 
 
-testF(NeopixelDefaults, test_getPin) {
+testF(NeoPixelDefaults, test_getPin) {
     const byte pin = test_controller->strip.getPin();
     assertEqual(pin, TEST_DATA_PIN);
 }
 
 
-testF(NeopixelDefaults, test_numPixels) {
+testF(NeoPixelDefaults, test_numPixels) {
     const byte numPixels = test_controller->strip.numPixels();
     assertEqual(numPixels, TEST_NUM_PIX);
 }
 
 
-testF(NeopixelDefaults, test_on) {
+testF(NeoPixelDefaults, test_on) {
     assertTrue(test_controller->on);
 }
 
 
-testF(NeopixelDefaults, test_turn_off) {
+testF(NeoPixelDefaults, test_turn_off) {
     test_controller->turnOnOff(false);
     assertFalse(test_controller->on);
 }

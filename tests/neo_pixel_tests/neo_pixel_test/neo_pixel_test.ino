@@ -14,7 +14,7 @@ using namespace NeoPixel;
 NeoPixelController *test_controller;
 
 
-class NeopixelDefaults: public aunit::TestOnce {
+class NeoPixelDefaults: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -28,7 +28,7 @@ protected:
 };
 
 
-testF(NeopixelDefaults, test_setBrightness) {
+testF(NeoPixelDefaults, test_setBrightness) {
     test_controller->setBrightness(100);
     assertEqual(test_controller->brightness, 100);
     test_controller->setBrightness(255);

@@ -1,6 +1,7 @@
 #line 2 "twinkle_test.ino"
 
 #include <AUnitVerbose.h>
+
 #include <chocolate-smart-home-microcontrollers.h>
 
 #define TEST_DATA_PIN   6
@@ -12,7 +13,7 @@ using namespace NeoPixel;
 NeoPixelController *test_controller;
 
 
-class NeopixelSinglePixel: public aunit::TestOnce {
+class NeoPixelSinglePixel: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -28,18 +29,18 @@ protected:
 };
 
 
-testF(NeopixelSinglePixel, test_setTwinkle_default) {
+testF(NeoPixelSinglePixel, test_setTwinkle_default) {
     assertTrue(test_controller->twinkle);
 }
 
 
-testF(NeopixelSinglePixel, test_setTwinkle_false) {
+testF(NeoPixelSinglePixel, test_setTwinkle_false) {
     test_controller->setTwinkle(false);
     assertFalse(test_controller->twinkle);
 }
 
 
-testF(NeopixelSinglePixel, test_twinkle_loop_brightness_up) {
+testF(NeoPixelSinglePixel, test_twinkle_loop_brightness_up) {
     Pixel *pixel = &test_controller->pixels[0];
 
     assertEqual(pixel->brightness, 0);
@@ -59,7 +60,7 @@ testF(NeopixelSinglePixel, test_twinkle_loop_brightness_up) {
 }
 
 
-class NeopixelSinglePixelBright: public aunit::TestOnce {
+class NeoPixelSinglePixelBright: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -75,7 +76,7 @@ protected:
 };
 
 
-testF(NeopixelSinglePixelBright, test_twinkle_loop_brightness_down) {
+testF(NeoPixelSinglePixelBright, test_twinkle_loop_brightness_down) {
     Pixel *pixel = &test_controller->pixels[0];
 
     assertEqual(pixel->brightness, 255);
@@ -93,6 +94,54 @@ testF(NeopixelSinglePixelBright, test_twinkle_loop_brightness_down) {
     test_controller->loop();
     assertNotEqual(pixel->targetBrightness, 0);
 }
+
+
+class NeoPixelSinglePixelMutable: public aunit::TestOnce {
+protected:
+    void setup() override {
+        aunit::TestOnce::setup();
+        test_controller = new NeoPixelController;
+        test_controller->init(TEST_DATA_PIN, 1);
+        Pixel *pixel = &test_controller->pixels[0];
+        pixel->brightness = 0;
+        pixel->setTargetBrightness(0);
+        rgbs[0][0] = 0;
+        rgbs[0][1] = 127;
+        rgbs[0][2] = 255;
+        // Fill out remaining color components with all 77s.
+        for (byte i = 1; i < 9; i++)
+            for (byte ii = 0; ii < 3; ii++)
+                rgbs[i][ii] = 77;
+        pixel->colorIndex = 0;
+        pixel->r = rgbs[0][0];
+        pixel->g = rgbs[0][1];
+        pixel->b = rgbs[0][2];
+    }
+
+    void teardown() override {
+        aunit::TestOnce::teardown();
+    }
+};
+
+
+testF(NeoPixelSinglePixelMutable, test_single_pixel_mutate_color) {
+    Pixel *pixel = &test_controller->pixels[0];
+
+    assertEqual(pixel->r, 0);
+    assertEqual(pixel->g, 127);
+    assertEqual(pixel->b, 255);
+    assertEqual(pixel->colorIndex, 0);
+    assertEqual(pixel->brightness, 0);
+    assertEqual(pixel->targetBrightness, 0);
+
+    test_controller->loop();
+
+    assertNotEqual(pixel->colorIndex, 0);
+    assertEqual(pixel->r, 77);
+    assertEqual(pixel->g, 77);
+    assertEqual(pixel->b, 77);
+}
+
 
 void setup() {
     Serial.begin(115200);

@@ -21,7 +21,7 @@ struct Pixel {
         setColorRandomAny();
     }
 
-    void setTargetBrightness(byte minBrightness, byte maxBrightness) {
+    void setTargetBrightnessInRange(byte minBrightness, byte maxBrightness) {
         this->targetBrightness = random(minBrightness, maxBrightness);
     }
     void setTargetBrightness(byte targetBrightness) {

@@ -143,6 +143,36 @@ testF(NeoPixelSinglePixelMutable, test_single_pixel_mutate_color) {
 }
 
 
+class NeoPixelTargetBrightnessBrighterThanMaxBrightness: public aunit::TestOnce {
+protected:
+    void setup() override {
+        aunit::TestOnce::setup();
+        test_controller = new NeoPixelController;
+        test_controller->init(TEST_DATA_PIN, 1);
+        test_controller->brightness = 20;
+        Pixel *pixel = &test_controller->pixels[0];
+        pixel->targetBrightness = 255;
+    }
+
+    void teardown() override {
+        aunit::TestOnce::teardown();
+    }
+};
+
+
+testF(NeoPixelTargetBrightnessBrighterThanMaxBrightness, test_target_brightness_resets_when_brighter_than_max_brightness) {
+    Pixel *pixel = &test_controller->pixels[0];
+
+    assertEqual(test_controller->brightness, 20);
+    assertEqual(pixel->targetBrightness, 255);
+
+    test_controller->loop();
+
+    assertLess(pixel->targetBrightness, 20);
+
+}
+
+
 void setup() {
     Serial.begin(115200);
 #if defined(EPOXY_DUINO)

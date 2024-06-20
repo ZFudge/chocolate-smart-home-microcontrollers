@@ -1,5 +1,7 @@
 #include "pixel.h"
 
+#include "consts.cpp"
+
 
 void Pixel::setColorRandom() {
     this->colorIndex = Utils::getRandomIndex(this->colorIndex);
@@ -18,10 +20,14 @@ void Pixel::setColorRandomAny() {
 
 
 void Pixel::twinkle(byte maxBrightness) {
+    if (targetBrightness > maxBrightness) {
+        setTargetBrightnessInRange(0, maxBrightness);
+    }
     if (brightness == targetBrightness) {
         while (brightness == targetBrightness)
-            setTargetBrightness(10, maxBrightness);
-        setColorRandom();
+            setTargetBrightnessInRange(0, maxBrightness);
+        if (brightness <= MIN_TWINKLE_BRIGHTNESS_THRESHOLD)
+            setColorRandom();
     }
     incrementBrightness();
 }

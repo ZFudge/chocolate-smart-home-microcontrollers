@@ -35,6 +35,12 @@ testF(TestPixel, test_setTargetBrightness) {
 }
 
 
+testF(TestPixel, test_setTargetBrightnessInRange) {
+    test_pixel->setTargetBrightnessInRange(100, 101);
+    assertEqual(test_pixel->targetBrightness, 100);
+}
+
+
 testF(TestPixel, test_pixel_loop_incrementBrightness_up) {
     assertEqual(test_pixel->brightness, 0);
     assertEqual(test_pixel->targetBrightness, 255);
@@ -121,6 +127,28 @@ testF(TestPixelMutable, test_pixel_mutate_color) {
     assertEqual(test_pixel->g, 77);
     assertEqual(test_pixel->b, 77);
     assertLess(test_pixel->targetBrightness, 55);
+}
+
+
+class TestPixelBrightAndHighTargetBrightness: public aunit::TestOnce {
+protected:
+    void setup() override {
+        aunit::TestOnce::setup();
+        test_pixel = new Pixel;
+        test_pixel->brightness = 255;
+        test_pixel->setTargetBrightness(255);
+    }
+
+    void teardown() override {
+        aunit::TestOnce::teardown();
+    }
+};
+
+
+testF(TestPixelBrightAndHighTargetBrightness, test_reset_setTargetBrightness) {
+    assertEqual(test_pixel->targetBrightness, 255);
+    test_pixel->twinkle(20);
+    assertLess(test_pixel->targetBrightness, 20);
 }
 
 

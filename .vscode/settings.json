@@ -20,6 +20,8 @@
         "*.tcc": "cpp",
         "cstdint": "cpp",
         "bitset": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "__locale": "cpp",
+        "optional": "cpp"
     }
 }

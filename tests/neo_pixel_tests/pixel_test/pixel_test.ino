@@ -1,6 +1,7 @@
 #line 2 "pixel_test.ino"
 
 #include <AUnitVerbose.h>
+
 #include <chocolate-smart-home-microcontrollers.h>
 
 
@@ -60,7 +61,7 @@ protected:
         aunit::TestOnce::setup();
         test_pixel = new Pixel;
         test_pixel->brightness = 255;
-        test_pixel->setTargetBrightness(0);
+        test_pixel->targetBrightness = 0;
     }
 
     void teardown() override {
@@ -88,7 +89,7 @@ protected:
         aunit::TestOnce::setup();
         test_pixel = new Pixel;
         test_pixel->brightness = 0;
-        test_pixel->setTargetBrightness(0);
+        test_pixel->targetBrightness = 0;
         rgbs[0][0] = 0;
         rgbs[0][1] = 127;
         rgbs[0][2] = 255;
@@ -136,7 +137,7 @@ protected:
         aunit::TestOnce::setup();
         test_pixel = new Pixel;
         test_pixel->brightness = 255;
-        test_pixel->setTargetBrightness(255);
+        test_pixel->targetBrightness = 255;
     }
 
     void teardown() override {

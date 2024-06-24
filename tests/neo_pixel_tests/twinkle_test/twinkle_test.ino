@@ -4,6 +4,7 @@
 
 #include <chocolate-smart-home-microcontrollers.h>
 
+
 #define TEST_DATA_PIN   6
 
 
@@ -20,7 +21,7 @@ protected:
         test_controller = new NeoPixelController;
         test_controller->init(TEST_DATA_PIN, 1);
         Pixel *pixel = &test_controller->pixels[0];
-        pixel->setTargetBrightness(255);
+        pixel->targetBrightness = 255;
     }
 
     void teardown() override {
@@ -104,7 +105,7 @@ protected:
         test_controller->init(TEST_DATA_PIN, 1);
         Pixel *pixel = &test_controller->pixels[0];
         pixel->brightness = 0;
-        pixel->setTargetBrightness(0);
+        pixel->targetBrightness = 0;
         rgbs[0][0] = 0;
         rgbs[0][1] = 127;
         rgbs[0][2] = 255;
@@ -169,7 +170,6 @@ testF(NeoPixelTargetBrightnessBrighterThanMaxBrightness, test_target_brightness_
     test_controller->loop();
 
     assertLess(pixel->targetBrightness, 20);
-
 }
 
 

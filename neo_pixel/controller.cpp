@@ -29,7 +29,7 @@ void NeoPixel::NeoPixelController::loop() {
                Dim from        higher brightness to lower brightness (when twinkle is off) */
             if (twinkle) {
                 // Pixels will automatically twinkle at the appropriate brightness.
-                ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true; 
+                ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
             } else {
                 // Manually turn on.
                 bool DONE_CHANGING_BRIGHTNESS = true;
@@ -44,7 +44,7 @@ void NeoPixel::NeoPixelController::loop() {
                         DONE_CHANGING_BRIGHTNESS = false;
                     if (!this->transform)
                         // No twinkling or color transforms. Just apply brightness.
-                        pixel->applyBrightnessAndOrRGBtoNeoPixel();
+                        this->applyBrightnessAndOrRGBtoNeoPixel(i, pixel);
                 }
                 if (DONE_CHANGING_BRIGHTNESS)
                     this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
@@ -60,7 +60,7 @@ void NeoPixel::NeoPixelController::loop() {
                     DONE_TURNING_OFF = false;
                 if (!this->transform)
                     // Transform false. Twinkling won't apply when controller is off. Just apply brightness. """
-                    pixel->applyBrightnessAndOrRGBtoNeoPixel();
+                    this->applyBrightnessAndOrRGBtoNeoPixel(i, pixel);
             }
             if (DONE_TURNING_OFF)
                 this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
@@ -86,7 +86,9 @@ void NeoPixel::NeoPixelController::loop() {
             pixel->transform();
 
         // Brightness or RGB changed. Apply them.
-        pixel->applyBrightnessAndOrRGBtoNeoPixel();
+        this->applyBrightnessAndOrRGBtoNeoPixel(i, pixel);
     }
+
+    this->strip.show();
 }
 

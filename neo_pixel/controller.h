@@ -40,6 +40,16 @@ struct NeoPixelController : public Adafruit_NeoPixel {
     void setTransform(const bool transform) {
         this->transform = transform;
     };
+    void applyBrightnessAndOrRGBtoNeoPixel(byte index, Pixel *pixel) {
+        this->strip.setPixelColor(
+            index,
+            strip.Color(
+                pixel->r,
+                pixel->g,
+                pixel->b
+            )
+        );
+    };
 };
 
 }

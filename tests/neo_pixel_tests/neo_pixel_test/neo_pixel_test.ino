@@ -1,6 +1,7 @@
-#line 2 "on_test.ino"
+#line 2 "neo_pixel_test.ino"
 
 #include <AUnitVerbose.h>
+
 #include <chocolate-smart-home-microcontrollers.h>
 
 
@@ -14,7 +15,7 @@ using namespace NeoPixel;
 NeoPixelController *test_controller;
 
 
-class NeoPixelDefaults: public aunit::TestOnce {
+class NeoPixelDefault: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -28,7 +29,14 @@ protected:
 };
 
 
-testF(NeoPixelDefaults, test_setBrightness) {
+testF(NeoPixelDefault, test_turn_off) {
+    assertTrue(test_controller->on);
+    test_controller->turnOnOff(false);
+    assertFalse(test_controller->on);
+}
+
+
+testF(NeoPixelDefault, test_setBrightness) {
     test_controller->setBrightness(100);
     assertEqual(test_controller->brightness, 100);
     test_controller->setBrightness(255);
@@ -37,6 +45,34 @@ testF(NeoPixelDefaults, test_setBrightness) {
     assertEqual(test_controller->brightness, 246);
     test_controller->setBrightness(300);
     assertEqual(test_controller->brightness, 44);
+}
+
+
+class NeoPixelOff: public aunit::TestOnce {
+protected:
+    void setup() override {
+        aunit::TestOnce::setup();
+        test_controller = new NeoPixelController;
+        test_controller->init(TEST_DATA_PIN, TEST_NUM_PIX);
+        test_controller->on = false;
+        test_controller->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+    }
+
+    void teardown() override {
+        aunit::TestOnce::teardown();
+    }
+};
+
+
+testF(NeoPixelOff, test_turn_on) {
+    assertFalse(test_controller->on);
+    test_controller->turnOnOff(true);
+    assertTrue(test_controller->on);
+}
+
+
+test(neo_pixel_getRandomIndex) {
+    assertNotEqual(Utils::getRandomIndex(1), 1);
 }
 
 

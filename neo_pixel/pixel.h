@@ -15,6 +15,9 @@ struct Pixel {
     void twinkle(byte maxBrightness);
     void transform();
 
+    void setRGBFromIndex();
+
+    void setColorIndex(byte index);
     void setColorRandom();
     void setColorRandomAny();
 
@@ -32,8 +35,6 @@ struct Pixel {
     void incrementBrightness() {
         this->brightness += brightness < targetBrightness ? 1 : -1;
     }
-
-    void applyBrightnessAndOrRGBtoNeoPixel();
 };
 
 #endif

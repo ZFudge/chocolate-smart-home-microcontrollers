@@ -22,7 +22,7 @@ NeoPixelController *test_controller;
 
 /* START brightness adjusts downward */
 
-class ControllerOn__Twinkle__Transform__BrightenedPixels: public aunit::TestOnce {
+class Brightness__ControllerOn__Twinkle__Transform__BrightenedPixels: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -44,7 +44,7 @@ protected:
     }
 };
 
-testF(ControllerOn__Twinkle__Transform__BrightenedPixels, test_brightness_down) {
+testF(Brightness__ControllerOn__Twinkle__Transform__BrightenedPixels, brightness_down) {
     assertEqual(test_controller->brightness, 50);
     for (byte brightness = 255; brightness >= 50; brightness--) {
         for (byte i = 0; i < TEST_NUM_PIX; i++) {
@@ -55,7 +55,7 @@ testF(ControllerOn__Twinkle__Transform__BrightenedPixels, test_brightness_down) 
 }
 
 
-class ControllerOn__Twinkle__TransformOff__BrightenedPixels: public aunit::TestOnce {
+class Brightness__ControllerOn__Twinkle__TransformOff__BrightenedPixels: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -77,7 +77,7 @@ protected:
     }
 };
 
-testF(ControllerOn__Twinkle__TransformOff__BrightenedPixels, test_brightness_down) {
+testF(Brightness__ControllerOn__Twinkle__TransformOff__BrightenedPixels, brightness_down) {
     assertEqual(test_controller->brightness, 50);
     for (byte brightness = 255; brightness >= 50; brightness--) {
         for (byte i = 0; i < TEST_NUM_PIX; i++) {
@@ -88,7 +88,7 @@ testF(ControllerOn__Twinkle__TransformOff__BrightenedPixels, test_brightness_dow
 }
 
 
-class ControllerOn__TwinkleOff__Transform__BrightenedPixels: public aunit::TestOnce {
+class Brightness__ControllerOn__TwinkleOff__Transform__BrightenedPixels: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -110,7 +110,7 @@ protected:
     }
 };
 
-testF(ControllerOn__TwinkleOff__Transform__BrightenedPixels, test_brightness_down) {
+testF(Brightness__ControllerOn__TwinkleOff__Transform__BrightenedPixels, brightness_down) {
     assertEqual(test_controller->brightness, 50);
     for (byte brightness = 255; brightness >= 50; brightness--) {
         for (byte i = 0; i < TEST_NUM_PIX; i++) {
@@ -121,7 +121,7 @@ testF(ControllerOn__TwinkleOff__Transform__BrightenedPixels, test_brightness_dow
 }
 
 
-class ControllerOn__TwinkleOff__TransformOff__BrightenedPixels: public aunit::TestOnce {
+class Brightness__ControllerOn__TwinkleOff__TransformOff__BrightenedPixels: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -143,7 +143,7 @@ protected:
     }
 };
 
-testF(ControllerOn__TwinkleOff__TransformOff__BrightenedPixels, test_brightness_down) {
+testF(Brightness__ControllerOn__TwinkleOff__TransformOff__BrightenedPixels, brightness_down) {
     assertEqual(test_controller->brightness, 50);
     for (byte brightness = 255; brightness >= 50; brightness--) {
         for (byte i = 0; i < TEST_NUM_PIX; i++) {
@@ -154,7 +154,7 @@ testF(ControllerOn__TwinkleOff__TransformOff__BrightenedPixels, test_brightness_
 }
 
 
-class ControlleOff_Twinkle_Transform__BrightenedPixels: public aunit::TestOnce {
+class Brightness__ControlleOff_Twinkle_Transform__BrightenedPixels: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -177,7 +177,7 @@ protected:
     }
 };
 
-testF(ControlleOff_Twinkle_Transform__BrightenedPixels, test_brightness_down) {
+testF(Brightness__ControlleOff_Twinkle_Transform__BrightenedPixels, brightness_down) {
     assertEqual(test_controller->brightness, 50);
     for (byte brightness = 255; brightness > 0; brightness--) {
         for (byte i = 0; i < TEST_NUM_PIX; i++) {
@@ -188,7 +188,7 @@ testF(ControlleOff_Twinkle_Transform__BrightenedPixels, test_brightness_down) {
 }
 
 
-class ControllerOff_TwinkleOff_Transform__BrightenedPixels: public aunit::TestOnce {
+class Brightness__ControllerOff_TwinkleOff_Transform__BrightenedPixels: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -211,7 +211,7 @@ protected:
     }
 };
 
-testF(ControllerOff_TwinkleOff_Transform__BrightenedPixels, test_brightness_down) {
+testF(Brightness__ControllerOff_TwinkleOff_Transform__BrightenedPixels, brightness_down) {
     assertEqual(test_controller->brightness, 50);
     for (byte brightness = 255; brightness > 0; brightness--) {
         for (byte i = 0; i < TEST_NUM_PIX; i++) {
@@ -222,7 +222,7 @@ testF(ControllerOff_TwinkleOff_Transform__BrightenedPixels, test_brightness_down
 }
 
 
-class ControllerOff_Twinkle_TransformOff__BrightenedPixels: public aunit::TestOnce {
+class Brightness__ControllerOff_Twinkle_TransformOff__BrightenedPixels: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -246,7 +246,7 @@ protected:
     }
 };
 
-testF(ControllerOff_Twinkle_TransformOff__BrightenedPixels, test_brightness_down) {
+testF(Brightness__ControllerOff_Twinkle_TransformOff__BrightenedPixels, brightness_down) {
     assertEqual(test_controller->brightness, 50);
     for (byte brightness = 255; brightness > 0; brightness--) {
         for (byte i = 0; i < TEST_NUM_PIX; i++) {
@@ -257,7 +257,7 @@ testF(ControllerOff_Twinkle_TransformOff__BrightenedPixels, test_brightness_down
 }
 
 
-class ControllerOff_TwinkleOff_TransformOff__BrightenedPixels: public aunit::TestOnce {
+class Brightness__ControllerOff_TwinkleOff_TransformOff__BrightenedPixels: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -281,7 +281,7 @@ protected:
     }
 };
 
-testF(ControllerOff_TwinkleOff_TransformOff__BrightenedPixels, test_brightness_down) {
+testF(Brightness__ControllerOff_TwinkleOff_TransformOff__BrightenedPixels, brightness_down) {
     assertEqual(test_controller->brightness, 50);
     for (byte brightness = 255; brightness > 0; brightness--) {
         for (byte i = 0; i < TEST_NUM_PIX; i++) {
@@ -293,14 +293,13 @@ testF(ControllerOff_TwinkleOff_TransformOff__BrightenedPixels, test_brightness_d
 
 /* END brightness adjusts downward */
 
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 /* START brightness adjusts upward */
 
 
-class ControllerOn_Twinkle_Transform__DimmedPixels: public aunit::TestOnce {
+class Brightness__ControllerOn_Twinkle_Transform__DimmedPixels: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -321,7 +320,7 @@ protected:
     }
 };
 
-testF(ControllerOn_Twinkle_Transform__DimmedPixels, test_brightness_up) {
+testF(Brightness__ControllerOn_Twinkle_Transform__DimmedPixels, brightness_up) {
     assertEqual(test_controller->brightness, 255);
     assertFalse(test_controller->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
 
@@ -334,7 +333,7 @@ testF(ControllerOn_Twinkle_Transform__DimmedPixels, test_brightness_up) {
 }
 
 
-class ControllerOn_Twinkle_TransformOff__DimmedPixels: public aunit::TestOnce {
+class Brightness__ControllerOn_Twinkle_TransformOff__DimmedPixels: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -355,7 +354,7 @@ protected:
     }
 };
 
-testF(ControllerOn_Twinkle_TransformOff__DimmedPixels, test_brightness_up) {
+testF(Brightness__ControllerOn_Twinkle_TransformOff__DimmedPixels, brightness_up) {
     assertEqual(test_controller->brightness, 255);
     assertFalse(test_controller->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
 
@@ -368,7 +367,7 @@ testF(ControllerOn_Twinkle_TransformOff__DimmedPixels, test_brightness_up) {
 }
 
 
-class ControllerOn_TwinkleOff_Transform__DimmedPixels: public aunit::TestOnce {
+class Brightness__ControllerOn_TwinkleOff_Transform__DimmedPixels: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -389,7 +388,7 @@ protected:
     }
 };
 
-testF(ControllerOn_TwinkleOff_Transform__DimmedPixels, test_brightness_up) {
+testF(Brightness__ControllerOn_TwinkleOff_Transform__DimmedPixels, brightness_up) {
     assertEqual(test_controller->brightness, 255);
     assertFalse(test_controller->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
 
@@ -402,7 +401,7 @@ testF(ControllerOn_TwinkleOff_Transform__DimmedPixels, test_brightness_up) {
 }
 
 
-class ControllerOn_TwinkleOff_TransformOff__DimmedPixels: public aunit::TestOnce {
+class Brightness__ControllerOn_TwinkleOff_TransformOff__DimmedPixels: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -423,7 +422,7 @@ protected:
     }
 };
 
-testF(ControllerOn_TwinkleOff_TransformOff__DimmedPixels, test_brightness_up) {
+testF(Brightness__ControllerOn_TwinkleOff_TransformOff__DimmedPixels, brightness_up) {
     assertEqual(test_controller->brightness, 255);
     assertFalse(test_controller->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
 
@@ -436,6 +435,8 @@ testF(ControllerOn_TwinkleOff_TransformOff__DimmedPixels, test_brightness_up) {
 }
 
 /* END brightness adjusts upward */
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 void setup() {

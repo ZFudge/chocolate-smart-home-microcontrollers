@@ -1,7 +1,7 @@
-#ifndef CONFIGURATION_H_
-#define CONFIGURATION_H_
+#ifndef CONFIGURATION_H
+#define CONFIGURATION_H
 
-const uint8_t MQTT_ID = 1;
+const byte MQTT_ID = 1;
 const String  NAME    = "";
 
 char MQTT_SERVER[] = "";

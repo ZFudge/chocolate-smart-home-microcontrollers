@@ -29,13 +29,13 @@ protected:
 };
 
 
-testF(NeoPixelStripDefault, test_getPin) {
+testF(NeoPixelStripDefault, getPin) {
     const byte pin = test_controller->strip.getPin();
     assertEqual(pin, TEST_DATA_PIN);
 }
 
 
-testF(NeoPixelStripDefault, test_numPixels) {
+testF(NeoPixelStripDefault, numPixels) {
     const byte numPixels = test_controller->strip.numPixels();
     assertEqual(numPixels, TEST_NUM_PIX);
 }
@@ -83,7 +83,7 @@ protected:
 };
 
 
-testF(NeoPixelStripRGBs, test_color) {
+testF(NeoPixelStripRGBs, color) {
     Pixel *pixel;
 
     pixel = &test_controller->pixels[0];

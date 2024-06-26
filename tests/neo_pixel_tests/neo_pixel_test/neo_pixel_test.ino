@@ -29,14 +29,14 @@ protected:
 };
 
 
-testF(NeoPixelDefault, test_turn_off) {
+testF(NeoPixelDefault, turn_off) {
     assertTrue(test_controller->on);
     test_controller->turnOnOff(false);
     assertFalse(test_controller->on);
 }
 
 
-testF(NeoPixelDefault, test_setBrightness) {
+testF(NeoPixelDefault, setBrightness) {
     test_controller->setBrightness(100);
     assertEqual(test_controller->brightness, 100);
     test_controller->setBrightness(255);
@@ -64,7 +64,7 @@ protected:
 };
 
 
-testF(NeoPixelOff, test_turn_on) {
+testF(NeoPixelOff, turn_on) {
     assertFalse(test_controller->on);
     test_controller->turnOnOff(true);
     assertTrue(test_controller->on);

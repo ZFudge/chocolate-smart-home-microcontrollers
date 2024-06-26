@@ -11,7 +11,7 @@ using namespace NeoPixel;
 Pixel *test_pixel;
 
 
-class TestPixel: public aunit::TestOnce {
+class Neo_Pixel: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -25,24 +25,24 @@ protected:
 };
 
 
-testF(TestPixel, test_targetBrightness) {
+testF(Neo_Pixel, targetBrightness) {
     assertEqual(test_pixel->targetBrightness, 255);
 }
 
 
-testF(TestPixel, test_setTargetBrightness) {
+testF(Neo_Pixel, setTargetBrightness) {
     test_pixel->setTargetBrightness(123);
     assertEqual(test_pixel->targetBrightness, 123);
 }
 
 
-testF(TestPixel, test_setTargetBrightnessInRange) {
+testF(Neo_Pixel, setTargetBrightnessInRange) {
     test_pixel->setTargetBrightnessInRange(100, 101);
     assertEqual(test_pixel->targetBrightness, 100);
 }
 
 
-testF(TestPixel, test_pixel_loop_incrementBrightness_up) {
+testF(Neo_Pixel, pixel_loop_incrementBrightness_up) {
     assertEqual(test_pixel->brightness, 0);
     assertEqual(test_pixel->targetBrightness, 255);
 
@@ -55,7 +55,7 @@ testF(TestPixel, test_pixel_loop_incrementBrightness_up) {
 }
 
 
-class TestPixelBright: public aunit::TestOnce {
+class Neo_PixelBright: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -70,7 +70,7 @@ protected:
 };
 
 
-testF(TestPixelBright, test_pixel_loop_incrementBrightness_down) {
+testF(Neo_PixelBright, pixel_loop_incrementBrightness_down) {
     assertEqual(test_pixel->brightness, 255);
     assertEqual(test_pixel->targetBrightness, 0);
 
@@ -83,7 +83,7 @@ testF(TestPixelBright, test_pixel_loop_incrementBrightness_down) {
 }
 
 
-class TestPixelMutable: public aunit::TestOnce {
+class Neo_PixelMutable: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -109,7 +109,7 @@ protected:
 };
 
 
-testF(TestPixelMutable, test_pixel_mutate_brightness) {
+testF(Neo_PixelMutable, pixel_mutate_brightness) {
     assertEqual(test_pixel->brightness, 0);
     assertEqual(test_pixel->targetBrightness, 0);
     test_pixel->twinkle(55);
@@ -118,7 +118,7 @@ testF(TestPixelMutable, test_pixel_mutate_brightness) {
 }
 
 
-testF(TestPixelMutable, test_pixel_mutate_color) {
+testF(Neo_PixelMutable, pixel_mutate_color) {
     assertEqual(test_pixel->r, 0);
     assertEqual(test_pixel->g, 127);
     assertEqual(test_pixel->b, 255);
@@ -131,7 +131,7 @@ testF(TestPixelMutable, test_pixel_mutate_color) {
 }
 
 
-class TestPixelBrightAndHighTargetBrightness: public aunit::TestOnce {
+class Neo_PixelBrightAndHighTargetBrightness: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -146,7 +146,7 @@ protected:
 };
 
 
-testF(TestPixelBrightAndHighTargetBrightness, test_reset_setTargetBrightness) {
+testF(Neo_PixelBrightAndHighTargetBrightness, reset_setTargetBrightness) {
     assertEqual(test_pixel->targetBrightness, 255);
     test_pixel->twinkle(20);
     assertLess(test_pixel->targetBrightness, 20);

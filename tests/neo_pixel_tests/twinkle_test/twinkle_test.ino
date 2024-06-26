@@ -14,7 +14,7 @@ using namespace NeoPixel;
 NeoPixelController *test_controller;
 
 
-class NeoPixelSinglePixel: public aunit::TestOnce {
+class ControllerSinglePixel: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -30,18 +30,18 @@ protected:
 };
 
 
-testF(NeoPixelSinglePixel, test_setTwinkle_default) {
+testF(ControllerSinglePixel, setTwinkle_default) {
     assertTrue(test_controller->twinkle);
 }
 
 
-testF(NeoPixelSinglePixel, test_setTwinkle_false) {
+testF(ControllerSinglePixel, setTwinkle_false) {
     test_controller->setTwinkle(false);
     assertFalse(test_controller->twinkle);
 }
 
 
-testF(NeoPixelSinglePixel, test_twinkle_loop_brightness_up) {
+testF(ControllerSinglePixel, twinkle_loop_brightness_up) {
     Pixel *pixel = &test_controller->pixels[0];
 
     assertEqual(pixel->brightness, 0);
@@ -61,7 +61,7 @@ testF(NeoPixelSinglePixel, test_twinkle_loop_brightness_up) {
 }
 
 
-class NeoPixelSinglePixelBright: public aunit::TestOnce {
+class ControllerSinglePixelBright: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -77,7 +77,7 @@ protected:
 };
 
 
-testF(NeoPixelSinglePixelBright, test_twinkle_loop_brightness_down) {
+testF(ControllerSinglePixelBright, twinkle_loop_brightness_down) {
     Pixel *pixel = &test_controller->pixels[0];
 
     assertEqual(pixel->brightness, 255);
@@ -97,7 +97,7 @@ testF(NeoPixelSinglePixelBright, test_twinkle_loop_brightness_down) {
 }
 
 
-class NeoPixelSinglePixelMutable: public aunit::TestOnce {
+class ControllerSinglePixelMutable: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
@@ -125,7 +125,7 @@ protected:
 };
 
 
-testF(NeoPixelSinglePixelMutable, test_single_pixel_mutate_color) {
+testF(ControllerSinglePixelMutable, single_pixel_mutate_color) {
     Pixel *pixel = &test_controller->pixels[0];
 
     assertEqual(pixel->r, 0);
@@ -161,7 +161,7 @@ protected:
 };
 
 
-testF(NeoPixelTargetBrightnessBrighterThanMaxBrightness, test_target_brightness_resets_when_brighter_than_max_brightness) {
+testF(NeoPixelTargetBrightnessBrighterThanMaxBrightness, target_brightness_resets_when_brighter_than_max_brightness) {
     Pixel *pixel = &test_controller->pixels[0];
 
     assertEqual(test_controller->brightness, 20);

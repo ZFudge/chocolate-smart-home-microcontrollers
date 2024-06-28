@@ -97,6 +97,54 @@ testF(ControllerSinglePixelBright, twinkle_loop_brightness_down) {
 }
 
 
+class ControllerSinglePixelMutableNoTransform: public aunit::TestOnce {
+protected:
+    void setup() override {
+        aunit::TestOnce::setup();
+        test_controller = new NeoPixelController;
+        test_controller->init(TEST_DATA_PIN, 1);
+        test_controller->transform = false;
+        Pixel *pixel = &test_controller->pixels[0];
+        pixel->brightness = 0;
+        pixel->targetBrightness = 0;
+        rgbs[0][0] = 0;
+        rgbs[0][1] = 127;
+        rgbs[0][2] = 255;
+        // Fill out remaining color components with all 77s.
+        for (byte i = 1; i < 9; i++)
+            for (byte ii = 0; ii < 3; ii++)
+                rgbs[i][ii] = 77;
+        pixel->colorIndex = 0;
+        pixel->r = rgbs[0][0];
+        pixel->g = rgbs[0][1];
+        pixel->b = rgbs[0][2];
+    }
+
+    void teardown() override {
+        aunit::TestOnce::teardown();
+    }
+};
+
+
+testF(ControllerSinglePixelMutableNoTransform, single_pixel_mutate_color) {
+    Pixel *pixel = &test_controller->pixels[0];
+
+    assertEqual(pixel->r, 0.0);
+    assertEqual(pixel->g, 127.0);
+    assertEqual(pixel->b, 255.0);
+    assertEqual(pixel->colorIndex, 0);
+    assertEqual(pixel->brightness, 0);
+    assertEqual(pixel->targetBrightness, 0);
+
+    test_controller->loop();
+
+    assertNotEqual(pixel->colorIndex, 0);
+    assertEqual(pixel->r, 77.0);
+    assertEqual(pixel->g, 77.0);
+    assertEqual(pixel->b, 77.0);
+}
+
+
 class ControllerSinglePixelMutable: public aunit::TestOnce {
 protected:
     void setup() override {
@@ -128,19 +176,21 @@ protected:
 testF(ControllerSinglePixelMutable, single_pixel_mutate_color) {
     Pixel *pixel = &test_controller->pixels[0];
 
-    assertEqual(pixel->r, 0);
-    assertEqual(pixel->g, 127);
-    assertEqual(pixel->b, 255);
+    assertEqual(pixel->r, 0.0);
+    assertEqual(pixel->g, 127.0);
+    assertEqual(pixel->b, 255.0);
     assertEqual(pixel->colorIndex, 0);
     assertEqual(pixel->brightness, 0);
     assertEqual(pixel->targetBrightness, 0);
 
     test_controller->loop();
 
-    assertNotEqual(pixel->colorIndex, 0);
-    assertEqual(pixel->r, 77);
-    assertEqual(pixel->g, 77);
-    assertEqual(pixel->b, 77);
+    assertEqual(pixel->colorIndex, 0);
+    assertEqual(pixel->r, 0.0);
+    assertEqual(pixel->g, 127.0);
+    assertEqual(pixel->b, 255.0);
+    assertEqual(pixel->brightness, 1);
+    assertMore(pixel->targetBrightness, 0);
 }
 
 

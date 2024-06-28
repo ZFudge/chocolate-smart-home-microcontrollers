@@ -97,7 +97,7 @@ struct NeoPixelController : public Adafruit_NeoPixel {
 
             // Twinkle brightness
             if (twinkle && on)
-                pixel->twinkle(this->brightness);
+                pixel->twinkle(this->brightness, this->transform);
             // Transform RGB
             if (transform)
                 pixel->transform();

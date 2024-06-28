@@ -112,21 +112,21 @@ protected:
 testF(Neo_PixelMutable, pixel_mutate_brightness) {
     assertEqual(test_pixel->brightness, 0);
     assertEqual(test_pixel->targetBrightness, 0);
-    test_pixel->twinkle(55);
+    test_pixel->twinkle(55, false);
     assertNotEqual(test_pixel->brightness, 0);
     assertNotEqual(test_pixel->targetBrightness, 0);
 }
 
 
 testF(Neo_PixelMutable, pixel_mutate_color) {
-    assertEqual(test_pixel->r, 0);
-    assertEqual(test_pixel->g, 127);
-    assertEqual(test_pixel->b, 255);
-    test_pixel->twinkle(55);
+    assertEqual(test_pixel->r, 0.0);
+    assertEqual(test_pixel->g, 127.0);
+    assertEqual(test_pixel->b, 255.0);
+    test_pixel->twinkle(55, false);
     assertNotEqual(test_pixel->colorIndex, 0);
-    assertEqual(test_pixel->r, 77);
-    assertEqual(test_pixel->g, 77);
-    assertEqual(test_pixel->b, 77);
+    assertEqual(test_pixel->r, 77.0);
+    assertEqual(test_pixel->g, 77.0);
+    assertEqual(test_pixel->b, 77.0);
     assertLess(test_pixel->targetBrightness, 55);
 }
 
@@ -148,8 +148,44 @@ protected:
 
 testF(Neo_PixelBrightAndHighTargetBrightness, reset_setTargetBrightness) {
     assertEqual(test_pixel->targetBrightness, 255);
-    test_pixel->twinkle(20);
+    test_pixel->twinkle(20, false);
     assertLess(test_pixel->targetBrightness, 20);
+}
+
+
+class Transform: public aunit::TestOnce {
+protected:
+    void setup() override {
+        aunit::TestOnce::setup();
+        randomSeed(0);
+        rgbs[0][0] = 0;
+        rgbs[0][1] = 127;
+        rgbs[0][2] = 255;
+        for (byte i = 1; i < 8; i++) {
+            rgbs[i][0] = 123;
+            rgbs[i][1] = 55;
+            rgbs[i][2] = 200;
+        }
+        test_pixel = new Pixel;
+        test_pixel->colorIndex = 0;
+        test_pixel->r = rgbs[0][0];
+        test_pixel->g = rgbs[0][1];
+        test_pixel->b = rgbs[0][2];
+    }
+
+    void teardown() override {
+
+        aunit::TestOnce::teardown();
+    }
+};
+
+
+testF(Transform, setNewTransform) {
+    test_pixel->setNewTransform();
+
+    assertEqual(String(test_pixel->rTransformStep), "-0.54");
+    assertEqual(String(test_pixel->gTransformStep), "0.32");
+    assertEqual(String(test_pixel->bTransformStep), "0.24");
 }
 
 

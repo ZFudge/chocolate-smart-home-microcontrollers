@@ -153,24 +153,27 @@ testF(Neo_PixelBrightAndHighTargetBrightness, reset_setTargetBrightness) {
 }
 
 
+byte getColorIndex1(byte colorIndex) {
+    return 1;
+};
+byte getTransformStepsRemaining200() {
+    return 200;
+};
+
 class Transform: public aunit::TestOnce {
 protected:
     void setup() override {
         aunit::TestOnce::setup();
-        randomSeed(0);
         rgbs[0][0] = 0;
         rgbs[0][1] = 127;
         rgbs[0][2] = 255;
-        for (byte i = 1; i < 8; i++) {
-            rgbs[i][0] = 123;
-            rgbs[i][1] = 55;
-            rgbs[i][2] = 200;
-        }
+        rgbs[1][0] = 123;
+        rgbs[1][1] = 55;
+        rgbs[1][2] = 200;
         test_pixel = new Pixel;
         test_pixel->colorIndex = 0;
-        test_pixel->r = rgbs[0][0];
-        test_pixel->g = rgbs[0][1];
-        test_pixel->b = rgbs[0][2];
+        test_pixel->getColorIndexRandom = getColorIndex1;
+        test_pixel->getTransformStepsRemainingRandom = getTransformStepsRemaining200;
     }
 
     void teardown() override {
@@ -183,9 +186,9 @@ protected:
 testF(Transform, setNewTransform) {
     test_pixel->setNewTransform();
 
-    assertEqual(String(test_pixel->rTransformStep), "-0.54");
-    assertEqual(String(test_pixel->gTransformStep), "0.32");
-    assertEqual(String(test_pixel->bTransformStep), "0.24");
+    assertEqual(String(test_pixel->rTransformStep), "-0.62");
+    assertEqual(String(test_pixel->gTransformStep), "0.36");
+    assertEqual(String(test_pixel->bTransformStep), "0.28");
 }
 
 

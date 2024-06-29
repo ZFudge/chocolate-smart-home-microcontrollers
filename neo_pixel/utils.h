@@ -14,6 +14,33 @@ byte getRandomIndex(byte oldIndex) {
     return i;
 }
 
+byte getTargetBrightnessInRangeDefault(byte minBrightness, byte maxBrightness) {
+    return random(minBrightness, maxBrightness);
+}
+
+byte getTransformStepsRemainingRandomDefault() {
+    return random(170, 255);
+}
+
+byte getColorIndexRandomDefault(byte colorIndex) {
+    return getRandomIndex(colorIndex);
+};
+
+byte getColorRandomAnyDefault() {
+    return getRandomIndex(NUM_COLORS + 1);
+};
+
+struct PixelUtils {
+/* Util methods using randomization. Overwritable in testing. */
+    byte (*getColorIndexRandom)(byte colorIndex) = getColorIndexRandomDefault;
+    byte (*getColorRandomAny)() = getColorRandomAnyDefault;
+    byte (*getTargetBrightnessInRange)(byte minBrightness, byte maxBrightness)
+        = getTargetBrightnessInRangeDefault;
+    byte (*getTransformStepsRemainingRandom)()
+        = getTransformStepsRemainingRandomDefault;
+};
+
+
 }
 
 #endif

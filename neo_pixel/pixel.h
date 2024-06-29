@@ -5,9 +5,7 @@
 #include "utils.h"
 
 
-
-
-struct Pixel {
+struct Pixel : public Utils::PixelUtils {
 
 float r, g, b;
 byte colorIndex;
@@ -35,16 +33,16 @@ void setColorIndex(byte index) {
     this->colorIndex = index;
 }
 void setColorRandom() {
-    this->colorIndex = Utils::getRandomIndex(this->colorIndex);
+    this->colorIndex = getColorIndexRandom(this->colorIndex);
     this->setRGBFromIndex();
 }
 void setColorRandomAny() {
-    this->colorIndex = Utils::getRandomIndex(NUM_COLORS + 1);
+    this->colorIndex = getColorRandomAny();
     this->setRGBFromIndex();
 }
 
 void setTargetBrightnessInRange(byte minBrightness, byte maxBrightness) {
-    this->targetBrightness = random(minBrightness, maxBrightness);
+    this->targetBrightness = getTargetBrightnessInRange(minBrightness, maxBrightness);
 }
 void setTargetBrightness(byte targetBrightness) {
     this->targetBrightness = targetBrightness;
@@ -68,7 +66,7 @@ void twinkle(const byte maxBrightness, const bool transform) {
 }
 
 void setTransformStepsRemainingRandom() {
-    transformStepsRemaining = random(170, 255);
+    this->transformStepsRemaining = getTransformStepsRemainingRandom();
 }
 void setNewTransform() {
     this->setTransformStepsRemainingRandom();
@@ -82,11 +80,10 @@ void setNewTransform() {
     const float rDiff = (float)r1 - r2;
     const float gDiff = (float)g1 - g2;
     const float bDiff = (float)b1 - b2;
-    Serial.println(String(rDiff)+","+String(gDiff)+","+String(bDiff));
+
     this->rTransformStep = rDiff / (float)transformStepsRemaining;
     this->gTransformStep = gDiff / (float)transformStepsRemaining;
     this->bTransformStep = bDiff / (float)transformStepsRemaining;
-    Serial.println();
 }
 
 void transform() {

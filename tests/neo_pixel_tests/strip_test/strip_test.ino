@@ -28,12 +28,10 @@ protected:
     }
 };
 
-
 testF(NeoPixelStripDefault, getPin) {
     const byte pin = test_controller->strip.getPin();
     assertEqual(pin, TEST_DATA_PIN);
 }
-
 
 testF(NeoPixelStripDefault, numPixels) {
     const byte numPixels = test_controller->strip.numPixels();
@@ -47,6 +45,16 @@ protected:
         aunit::TestOnce::setup();
         test_controller = new NeoPixelController;
         test_controller->init(TEST_DATA_PIN, TEST_NUM_PIX);
+
+        test_controller->pixels[0].brightness = 255;
+        test_controller->pixels[1].brightness = 255;
+        test_controller->pixels[2].brightness = 255;
+        test_controller->pixels[3].brightness = 255;
+        test_controller->pixels[4].brightness = 255;
+        test_controller->pixels[5].brightness = 255;
+        test_controller->pixels[6].brightness = 255;
+        test_controller->pixels[7].brightness = 255;
+        test_controller->pixels[8].brightness = 255;
 
         rgbs[0][0] = 0;
         rgbs[0][1] = 10;
@@ -81,7 +89,6 @@ protected:
         aunit::TestOnce::teardown();
     }
 };
-
 
 testF(NeoPixelStripRGBs, color) {
     Pixel *pixel;

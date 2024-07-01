@@ -22,6 +22,9 @@
         "bitset": "cpp",
         "queue": "cpp",
         "__locale": "cpp",
-        "optional": "cpp"
+        "optional": "cpp",
+        "cmath": "cpp",
+        "memory": "cpp",
+        "functional": "cpp"
     }
 }

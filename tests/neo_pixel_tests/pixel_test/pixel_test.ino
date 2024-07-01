@@ -186,9 +186,9 @@ protected:
 testF(Transform, setNewTransform) {
     test_pixel->setNewTransform();
 
-    assertEqual(String(test_pixel->rTransformStep), "-0.62");
-    assertEqual(String(test_pixel->gTransformStep), "0.36");
-    assertEqual(String(test_pixel->bTransformStep), "0.28");
+    assertNear(test_pixel->rTransformStep, 0.62, 0.006);
+    assertNear(test_pixel->gTransformStep, -0.36, 0.006);
+    assertNear(test_pixel->bTransformStep, -0.28, 0.006);
 }
 
 

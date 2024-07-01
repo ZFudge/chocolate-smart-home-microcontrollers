@@ -15,7 +15,7 @@ byte brightness;
 byte targetBrightness;
 
 byte transformStepsRemaining;
-float rTransformStep, gTransformStep, bTransformStep;
+double rTransformStep, gTransformStep, bTransformStep;
 
 const byte MIN_TWINKLE_BRIGHTNESS_THRESHOLD = 5;
 
@@ -77,22 +77,25 @@ void setNewTransform() {
     const byte r2 = this->r;
     const byte g2 = this->g;
     const byte b2 = this->b;
-    const float rDiff = (float)r1 - r2;
-    const float gDiff = (float)g1 - g2;
-    const float bDiff = (float)b1 - b2;
+    const double rDiff = (double)r2 - r1;
+    const double gDiff = (double)g2 - g1;
+    const double bDiff = (double)b2 - b1;
 
-    this->rTransformStep = rDiff / (float)transformStepsRemaining;
-    this->gTransformStep = gDiff / (float)transformStepsRemaining;
-    this->bTransformStep = bDiff / (float)transformStepsRemaining;
+    this->rTransformStep = rDiff / (double)transformStepsRemaining;
+    this->gTransformStep = gDiff / (double)transformStepsRemaining;
+    this->bTransformStep = bDiff / (double)transformStepsRemaining;
+    this->r = r1;
+    this->g = g1;
+    this->b = b1;
 }
 
 void transform() {
-    // if (transformStepsRemaining <= 0)
-    //     setNewTransform();
-    // this->r += rTransformStep;
-    // this->g += gTransformStep;
-    // this->b += gTransformStep;
-    // this->transformStepsRemaining--;
+    if (transformStepsRemaining <= 0)
+        setNewTransform();
+    this->r += rTransformStep;
+    this->g += gTransformStep;
+    this->b += bTransformStep;
+    this->transformStepsRemaining--;
 }
 
 

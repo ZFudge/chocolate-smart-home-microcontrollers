@@ -1,0 +1,30 @@
+{
+    "files.associations": {
+        "cstddef": "cpp",
+        "cstdlib": "cpp",
+        "__bit_reference": "cpp",
+        "__hash_table": "cpp",
+        "__split_buffer": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "initializer_list": "cpp",
+        "span": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "format": "cpp",
+        "__config": "cpp",
+        "random": "cpp",
+        "ios": "cpp",
+        "*.tcc": "cpp",
+        "cstdint": "cpp",
+        "bitset": "cpp",
+        "queue": "cpp",
+        "__locale": "cpp",
+        "optional": "cpp",
+        "cmath": "cpp",
+        "memory": "cpp",
+        "functional": "cpp"
+    }
+}

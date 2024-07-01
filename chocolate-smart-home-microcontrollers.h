@@ -8,5 +8,6 @@
 namespace OnOff {
 #include "on_off/on_off.h"
 }
+#include "neo_pixel/neo_pixel.h"
 
 #endif

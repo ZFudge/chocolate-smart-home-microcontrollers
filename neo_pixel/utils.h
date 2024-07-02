@@ -6,7 +6,7 @@
 namespace Utils {
 
 
-byte getRandomIndex(byte oldIndex) {
+byte getRandomIndex(const byte oldIndex) {
     /* Return a different, random index */
     byte i = oldIndex;
     while (i == oldIndex)
@@ -14,32 +14,30 @@ byte getRandomIndex(byte oldIndex) {
     return i;
 }
 
-byte getTargetBrightnessInRangeDefault(byte minBrightness, byte maxBrightness) {
-    return random(minBrightness, maxBrightness);
-}
-
-byte getTransformStepsRemainingRandomDefault() {
-    return random(170, 255);
-}
-
-byte getColorIndexRandomDefault(byte colorIndex) {
-    return getRandomIndex(colorIndex);
-};
 
 byte getColorRandomAnyDefault() {
     return getRandomIndex(NUM_COLORS + 1);
 };
 
-struct PixelUtils {
-/* Util methods using randomization. Overwritable in testing. */
-    byte (*getColorIndexRandom)(byte colorIndex) = getColorIndexRandomDefault;
-    byte (*getColorRandomAny)() = getColorRandomAnyDefault;
-    byte (*getTargetBrightnessInRange)(byte minBrightness, byte maxBrightness)
-        = getTargetBrightnessInRangeDefault;
-    byte (*getTransformStepsRemainingRandom)()
-        = getTransformStepsRemainingRandomDefault;
+byte getTransformStepsRemainingRandomDefault() {
+    return random(170, 255);
+}
+
+byte getColorIndexRandomDefault(const byte colorIndex) {
+    return getRandomIndex(colorIndex);
 };
 
+byte getTargetBrightnessInRangeDefault(const byte minBrightness, const byte maxBrightness) {
+    return random(minBrightness, maxBrightness);
+}
+
+struct PixelUtils {
+/* Util methods using randomization. Overwritable in testing. */
+    byte (*getColorRandomAny)() = getColorRandomAnyDefault;
+    byte (*getTransformStepsRemainingRandom)() = getTransformStepsRemainingRandomDefault;
+    byte (*getColorIndexRandom)(const byte) = getColorIndexRandomDefault;
+    byte (*getTargetBrightnessInRange)(const byte, const byte) = getTargetBrightnessInRangeDefault;
+};
 
 }
 

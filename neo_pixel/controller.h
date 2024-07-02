@@ -132,14 +132,14 @@ void setTransform(const bool transform) {
     this->transform = transform;
 };
 
-byte applyBrightness(float colorComponent, float pixelBrightness) {
+byte applyBrightness(const float colorComponent, const float pixelBrightness) {
     float result = colorComponent;
     result *= (float)this->brightness / 255.0;
     result *= pixelBrightness / 255.0;
     return round(result);
 }
 
-void applyBrightnessAndOrRGBtoNeoPixel(byte index, Pixel *pixel) {
+void applyBrightnessAndOrRGBtoNeoPixel(const byte index, const Pixel *pixel) {
     this->strip.setPixelColor(
         index,
         strip.Color(

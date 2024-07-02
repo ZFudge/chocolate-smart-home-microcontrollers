@@ -29,7 +29,7 @@ void setRGBFromIndex() {
     this->b = rgbs[colorIndex][2];
 }
 
-void setColorIndex(byte index) {
+void setColorIndex(const byte index) {
     this->colorIndex = index;
 }
 void setColorRandom() {
@@ -41,10 +41,10 @@ void setColorRandomAny() {
     this->setRGBFromIndex();
 }
 
-void setTargetBrightnessInRange(byte minBrightness, byte maxBrightness) {
+void setTargetBrightnessInRange(const byte minBrightness, const byte maxBrightness) {
     this->targetBrightness = getTargetBrightnessInRange(minBrightness, maxBrightness);
 }
-void setTargetBrightness(byte targetBrightness) {
+void setTargetBrightness(const byte targetBrightness) {
     this->targetBrightness = targetBrightness;
 }
 
@@ -88,7 +88,7 @@ void setNewTransform() {
     this->g = g1;
     this->b = b1;
 }
-
+ 
 void transform() {
     if (transformStepsRemaining <= 0)
         setNewTransform();

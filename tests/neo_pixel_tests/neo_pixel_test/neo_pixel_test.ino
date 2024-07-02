@@ -12,62 +12,51 @@ using namespace NeoPixel;
 #define TEST_NUM_PIX    10
 
 
-NeoPixelController *test_controller;
-
-
 class NeoPixelDefault: public aunit::TestOnce {
 protected:
+    NeoPixelController test_controller;
     void setup() override {
         aunit::TestOnce::setup();
-        test_controller = new NeoPixelController;
-        test_controller->init(TEST_DATA_PIN, TEST_NUM_PIX);
-    }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
+        test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
     }
 };
 
 
 testF(NeoPixelDefault, turn_off) {
-    assertTrue(test_controller->on);
-    test_controller->turnOnOff(false);
-    assertFalse(test_controller->on);
+    assertTrue(test_controller.on);
+    test_controller.turnOnOff(false);
+    assertFalse(test_controller.on);
 }
 
 
 testF(NeoPixelDefault, setBrightness) {
-    test_controller->setBrightness(100);
-    assertEqual(test_controller->brightness, 100);
-    test_controller->setBrightness(255);
-    assertEqual(test_controller->brightness, 255);
-    test_controller->setBrightness(-10);
-    assertEqual(test_controller->brightness, 246);
-    test_controller->setBrightness(300);
-    assertEqual(test_controller->brightness, 44);
+    test_controller.setBrightness(100);
+    assertEqual(test_controller.brightness, 100);
+    test_controller.setBrightness(255);
+    assertEqual(test_controller.brightness, 255);
+    test_controller.setBrightness(-10);
+    assertEqual(test_controller.brightness, 246);
+    test_controller.setBrightness(300);
+    assertEqual(test_controller.brightness, 44);
 }
 
 
 class NeoPixelOff: public aunit::TestOnce {
 protected:
+    NeoPixelController test_controller;
     void setup() override {
         aunit::TestOnce::setup();
-        test_controller = new NeoPixelController;
-        test_controller->init(TEST_DATA_PIN, TEST_NUM_PIX);
-        test_controller->on = false;
-        test_controller->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
-    }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
+        test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+        test_controller.on = false;
+        test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
     }
 };
 
 
 testF(NeoPixelOff, turn_on) {
-    assertFalse(test_controller->on);
-    test_controller->turnOnOff(true);
-    assertTrue(test_controller->on);
+    assertFalse(test_controller.on);
+    test_controller.turnOnOff(true);
+    assertTrue(test_controller.on);
 }
 
 

@@ -86,8 +86,8 @@ protected:
     Pixel *pixel;
     void setup() override {
         aunit::TestOnce::setup();
-        test_controller.init(TEST_DATA_PIN, 1);
         test_controller.transform = false;
+        test_controller.init(TEST_DATA_PIN, 1);
         pixel = &test_controller.pixels[0];
         pixel->brightness = 0;
         pixel->targetBrightness = 0;
@@ -122,6 +122,9 @@ testF(ControllerSinglePixelMutableNoTransform, single_pixel_mutate_color) {
 }
 
 
+/*///////////////////////////////////////////////////////////////////////////*/
+/*// Controller_SinglePixelMutable Start ////////////////////////////////////*/
+
 int getColorIndex_call_count = 0;
 byte getColorIndex_1(byte colorIndex) {
     getColorIndex_call_count++;
@@ -130,7 +133,6 @@ byte getColorIndex_1(byte colorIndex) {
 int getTargetBrightnessInRange_call_count = 0;
 byte getTargetBrightnessInRange_patched(byte m1, byte m2) {
     getTargetBrightnessInRange_call_count++;
-
     switch (getTargetBrightnessInRange_call_count) {
         case 1:
             return 200;
@@ -229,6 +231,9 @@ testF(Controller_SinglePixelMutable, call_counts) {
     assertEqual(getColorIndex_call_count, 2);
     assertEqual(getTargetBrightnessInRange_call_count, 3);
 }
+
+/*// Controller_SinglePixelMutable End //////////////////////////////////////*/
+/*///////////////////////////////////////////////////////////////////////////*/
 
 
 class NeoPixelTargetBrightnessBrighterThanMaxBrightness: public aunit::TestOnce {

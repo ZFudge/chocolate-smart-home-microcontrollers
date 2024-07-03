@@ -70,6 +70,8 @@ void setTransformStepsRemainingRandom() {
 }
 void setNewTransform() {
     this->setTransformStepsRemainingRandom();
+    // Prevent rgb steps from drifting away from target colors.
+    this->setRGBFromIndex();
     const byte r1 = this->r;
     const byte g1 = this->g;
     const byte b1 = this->b;

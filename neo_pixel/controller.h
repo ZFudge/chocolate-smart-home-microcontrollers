@@ -63,9 +63,12 @@ void loop() {
                     }
                     if (pixel->brightness != this->brightness)
                         DONE_CHANGING_BRIGHTNESS = false;
-                    if (!this->transform)
+                    if (!this->transform) {
+                        if (pixel->transformStepsRemaining)
+                            pixel->transform();
                         // No twinkling or color transforms. Just apply brightness.
                         this->applyBrightnessAndOrRGBtoNeoPixel(i, pixel);
+                    }
                 }
                 if (DONE_CHANGING_BRIGHTNESS)
                     this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
@@ -79,9 +82,12 @@ void loop() {
                     pixel->brightness--;
                 if (pixel->brightness)
                     DONE_TURNING_OFF = false;
-                if (!this->transform)
+                if (!this->transform) {
+                    if (pixel->transformStepsRemaining)
+                        pixel->transform();
                     // Transform false. Twinkling won't apply when controller is off. Just apply brightness. """
                     this->applyBrightnessAndOrRGBtoNeoPixel(i, pixel);
+                }
             }
             if (DONE_TURNING_OFF)
                 this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
@@ -93,7 +99,7 @@ void loop() {
             OR
             controller is dimming and twinkling doesn't apply. */
         if (!twinkle || (twinkle && !on))
-            return;
+            return settleAnyTransforms();
 
     // Twinkle / Transform
     for (byte i = 0; i < numOfPixels; i++) {
@@ -103,7 +109,7 @@ void loop() {
         if (twinkle && on)
             pixel->twinkle(this->brightness, this->transform);
         // Transform RGB
-        if (transform)
+        if (transform || pixel->transformStepsRemaining)
             pixel->transform();
 
         // Brightness or RGB changed. Apply them.
@@ -131,8 +137,17 @@ void setTwinkle(const bool twinkle) {
 void setTransform(const bool transform) {
     this->transform = transform;
 };
+void settleAnyTransforms() {
+    for (byte i = 0; i < numOfPixels; i++) {
+        Pixel *pixel = &pixels[i];
+        if (!pixel->transformStepsRemaining)
+            continue;
+        pixel->transform();
+        this->applyBrightnessAndOrRGBtoNeoPixel(i, pixel);
+    }
+}
 
-byte applyBrightness(const float colorComponent, const float pixelBrightness) {
+const byte applyBrightness(const float colorComponent, const float pixelBrightness) {
     float result = colorComponent;
     result *= (float)this->brightness / 255.0;
     result *= pixelBrightness / 255.0;

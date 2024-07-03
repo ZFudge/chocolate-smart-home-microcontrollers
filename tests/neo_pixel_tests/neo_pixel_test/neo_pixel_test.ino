@@ -12,6 +12,19 @@ using namespace NeoPixel;
 #define TEST_NUM_PIX    10
 
 
+test(two_controllers) {
+    NeoPixelController test_controller_0;
+    test_controller_0.init(6, 2);
+    assertEqual(6, test_controller_0.strip.getPin());
+    assertEqual(2, test_controller_0.strip.numPixels());
+
+    NeoPixelController test_controller_1;
+    test_controller_1.init(7, 3);
+    assertEqual(7, test_controller_1.strip.getPin());
+    assertEqual(3, test_controller_1.strip.numPixels());
+}
+
+
 class NeoPixelDefault: public aunit::TestOnce {
 protected:
     NeoPixelController test_controller;
@@ -21,13 +34,11 @@ protected:
     }
 };
 
-
 testF(NeoPixelDefault, turn_off) {
     assertTrue(test_controller.on);
     test_controller.turnOnOff(false);
     assertFalse(test_controller.on);
 }
-
 
 testF(NeoPixelDefault, setBrightness) {
     test_controller.setBrightness(100);
@@ -52,13 +63,11 @@ protected:
     }
 };
 
-
 testF(NeoPixelOff, turn_on) {
     assertFalse(test_controller.on);
     test_controller.turnOnOff(true);
     assertTrue(test_controller.on);
 }
-
 
 test(neo_pixel_getRandomIndex) {
     assertNotEqual(Utils::getRandomIndex(1), 1);

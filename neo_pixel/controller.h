@@ -3,6 +3,7 @@
 
 #include <Adafruit_NeoPixel.h>
 
+#include "consts.h"
 #include "pixel.h"
 
 namespace NeoPixel {
@@ -164,6 +165,22 @@ void applyBrightnessAndOrRGBtoNeoPixel(const byte index, const Pixel *pixel) {
         )
     );
 };
+
+void updateRGBS(String csvPalette) {
+    // Update palette.
+    for (byte i = 0; i < PIXELS_LENGTH; i++) {
+        const byte colorComponent = byte(csvPalette.substring(0, csvPalette.indexOf(',')).toInt());
+        csvPalette = csvPalette.substring(csvPalette.indexOf(',') + 1, csvPalette.length());
+        rgbs[i / 3][i % 3] = colorComponent;
+    }
+    // Update any transform color targets.
+    for (byte i = 0; i < numOfPixels; i++) {
+        Pixel *pixel = &pixels[i];
+        if (!this->transform && !pixel->transformStepsRemaining)
+            continue;
+        pixel->setNewTransformTargetFromCurrentState();
+    }
+}
 
 };
 

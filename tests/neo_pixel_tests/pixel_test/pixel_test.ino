@@ -8,6 +8,9 @@
 using namespace NeoPixel;
 
 
+const double ERROR_BOUND = 0.00075;
+
+
 Pixel *test_pixel;
 
 
@@ -186,9 +189,9 @@ protected:
 testF(Transform, setNewTransform) {
     test_pixel->setNewTransform();
 
-    assertNear(test_pixel->rTransformStep, 0.62, 0.006);
-    assertNear(test_pixel->gTransformStep, -0.36, 0.006);
-    assertNear(test_pixel->bTransformStep, -0.28, 0.006);
+    assertNear(test_pixel->rTransformStep, 0.615, ERROR_BOUND);
+    assertNear(test_pixel->gTransformStep, -0.36, ERROR_BOUND);
+    assertNear(test_pixel->bTransformStep, -0.275, ERROR_BOUND);
 }
 
 

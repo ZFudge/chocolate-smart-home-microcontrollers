@@ -66,9 +66,9 @@ void loop() {
                         DONE_CHANGING_BRIGHTNESS = false;
                     if (!this->transform) {
                         if (pixel->transformStepsRemaining)
-                            pixel->transform();
+                            pixel->transform(this->transform);
                         // No twinkling or color transforms. Just apply brightness.
-                        this->applyBrightnessAndOrRGBtoNeoPixel(i, pixel);
+                        this->applyPixelSettingsToNeoPixel(i, pixel);
                     }
                 }
                 if (DONE_CHANGING_BRIGHTNESS)
@@ -85,9 +85,9 @@ void loop() {
                     DONE_TURNING_OFF = false;
                 if (!this->transform) {
                     if (pixel->transformStepsRemaining)
-                        pixel->transform();
+                        pixel->transform(this->transform);
                     // Transform false. Twinkling won't apply when controller is off. Just apply brightness. """
-                    this->applyBrightnessAndOrRGBtoNeoPixel(i, pixel);
+                    this->applyPixelSettingsToNeoPixel(i, pixel);
                 }
             }
             if (DONE_TURNING_OFF)
@@ -111,10 +111,10 @@ void loop() {
             pixel->twinkle(this->brightness, this->transform);
         // Transform RGB
         if (transform || pixel->transformStepsRemaining)
-            pixel->transform();
+            pixel->transform(this->transform);
 
         // Brightness or RGB changed. Apply them.
-        this->applyBrightnessAndOrRGBtoNeoPixel(i, pixel);
+        this->applyPixelSettingsToNeoPixel(i, pixel);
     }
 
     this->strip.show();
@@ -143,27 +143,25 @@ void settleAnyTransforms() {
         Pixel *pixel = &pixels[i];
         if (!pixel->transformStepsRemaining)
             continue;
-        pixel->transform();
-        this->applyBrightnessAndOrRGBtoNeoPixel(i, pixel);
+        pixel->transform(this->transform);
+        this->applyPixelSettingsToNeoPixel(i, pixel);
     }
 }
 
 const byte applyBrightness(const float colorComponent, const float pixelBrightness) {
-    float result = colorComponent;
-    result *= (float)this->brightness / 255.0;
-    result *= pixelBrightness / 255.0;
+    double result = colorComponent;
+    result *= (double)this->brightness / (double)255.0;
+    result *= pixelBrightness / (double)255.0;
     return round(result);
 }
 
-void applyBrightnessAndOrRGBtoNeoPixel(const byte index, const Pixel *pixel) {
-    this->strip.setPixelColor(
-        index,
-        strip.Color(
-            applyBrightness(pixel->r, pixel->brightness),
-            applyBrightness(pixel->g, pixel->brightness),
-            applyBrightness(pixel->b, pixel->brightness)
-        )
+void applyPixelSettingsToNeoPixel(const byte pixelIndex, const Pixel *pixel) {
+    const uint32_t pixelColor = strip.Color(
+        applyBrightness(pixel->r, pixel->brightness),
+        applyBrightness(pixel->g, pixel->brightness),
+        applyBrightness(pixel->b, pixel->brightness)
     );
+    this->strip.setPixelColor(pixelIndex, pixelColor);
 };
 
 void updateRGBS(String csvPalette) {

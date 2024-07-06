@@ -82,55 +82,55 @@ testF(NeoPixelStripRGBs, color) {
     pixel = &test_controller.pixels[0];
     pixel->setColorIndex(0);
     pixel->setRGBFromIndex();
-    test_controller.applyBrightnessAndOrRGBtoNeoPixel(0, pixel);
+    test_controller.applyPixelSettingsToNeoPixel(0, pixel);
     assertEqual(uint32_t(2580), test_controller.strip.getPixelColor(0));
 
     pixel = &test_controller.pixels[1];
     pixel->setColorIndex(1);
     pixel->setRGBFromIndex();
-    test_controller.applyBrightnessAndOrRGBtoNeoPixel(1, pixel);
+    test_controller.applyPixelSettingsToNeoPixel(1, pixel);
     assertEqual(uint32_t(1976370), test_controller.strip.getPixelColor(1));
 
     pixel = &test_controller.pixels[2];
     pixel->setColorIndex(2);
     pixel->setRGBFromIndex();
-    test_controller.applyBrightnessAndOrRGBtoNeoPixel(2, pixel);
+    test_controller.applyPixelSettingsToNeoPixel(2, pixel);
     assertEqual(uint32_t(3950160), test_controller.strip.getPixelColor(2));
 
     pixel = &test_controller.pixels[3];
     pixel->setColorIndex(3);
     pixel->setRGBFromIndex();
-    test_controller.applyBrightnessAndOrRGBtoNeoPixel(3, pixel);
+    test_controller.applyPixelSettingsToNeoPixel(3, pixel);
     assertEqual(uint32_t(5923950), test_controller.strip.getPixelColor(3));
 
     pixel = &test_controller.pixels[4];
     pixel->setColorIndex(4);
     pixel->setRGBFromIndex();
-    test_controller.applyBrightnessAndOrRGBtoNeoPixel(4, pixel);
+    test_controller.applyPixelSettingsToNeoPixel(4, pixel);
     assertEqual(uint32_t(7897740), test_controller.strip.getPixelColor(4));
 
     pixel = &test_controller.pixels[5];
     pixel->setColorIndex(5);
     pixel->setRGBFromIndex();
-    test_controller.applyBrightnessAndOrRGBtoNeoPixel(5, pixel);
+    test_controller.applyPixelSettingsToNeoPixel(5, pixel);
     assertEqual(uint32_t(9871530), test_controller.strip.getPixelColor(5));
 
     pixel = &test_controller.pixels[6];
     pixel->setColorIndex(6);
     pixel->setRGBFromIndex();
-    test_controller.applyBrightnessAndOrRGBtoNeoPixel(6, pixel);
+    test_controller.applyPixelSettingsToNeoPixel(6, pixel);
     assertEqual(uint32_t(11845320), test_controller.strip.getPixelColor(6));
 
     pixel = &test_controller.pixels[7];
     pixel->setColorIndex(7);
     pixel->setRGBFromIndex();
-    test_controller.applyBrightnessAndOrRGBtoNeoPixel(7, pixel);
+    test_controller.applyPixelSettingsToNeoPixel(7, pixel);
     assertEqual(uint32_t(13819110), test_controller.strip.getPixelColor(7));
 
     pixel = &test_controller.pixels[8];
     pixel->setColorIndex(8);
     pixel->setRGBFromIndex();
-    test_controller.applyBrightnessAndOrRGBtoNeoPixel(8, pixel);
+    test_controller.applyPixelSettingsToNeoPixel(8, pixel);
     assertEqual(uint32_t(15792895), test_controller.strip.getPixelColor(8));
 }
 

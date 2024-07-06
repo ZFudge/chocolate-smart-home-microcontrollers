@@ -13,6 +13,10 @@ using namespace NeoPixel;
 
 
 const double ERROR_BOUND = 0.00075;
+byte getColorIndex1(byte colorIndex) { return 1; };
+byte getColorIndex0(byte colorIndex) { return 0; };
+byte getColorIndex2(byte colorIndex) { return 2; };
+byte getTransformStepsRemaining200() { return 200; };
 
 
 class TestNeoPixelController {
@@ -35,10 +39,24 @@ protected:
 };
 
 testF(TransformOff, transform_false) {
-    assertFalse(test_controller.transform);
+    /* Idempotently call test_controller.setTransform with false */
+    for (byte i = 0; i < 100; i++) {
+        test_controller.setTransform(false);
+        assertFalse(test_controller.transform);
+    }
+}
+
+testF(TransformOff, transform_true) {
+    /* Idempotently call test_controller.setTransform with true */
+    for (byte i = 0; i < 100; i++) {
+        test_controller.setTransform(true);
+        assertTrue(test_controller.transform);
+    }
 }
 
 testF(TransformOff, steps_not_set) {
+    /* Transform steps should not be set when transform is off when
+    controller.init is called. */
     for (byte i = 0; i < TEST_NUM_PIX; i++) {
         Pixel *pixel = &test_controller.pixels[i];
         assertEqual(pixel->rTransformStep, 0.0);
@@ -49,10 +67,6 @@ testF(TransformOff, steps_not_set) {
 
 /*///////////////////////////////////////////////////////////////////////////*/
 /*// Transform Start ////////////////////////////////////////////////////////*/
-byte getColorIndex1(byte colorIndex) { return 1; };
-byte getColorIndex0(byte colorIndex) { return 0; };
-byte getColorIndex2(byte colorIndex) { return 2; };
-byte getTransformStepsRemaining200() { return 200; };
 class Transform: public aunit::TestOnce, public TestNeoPixelController {
 protected:
     Pixel *pixel;
@@ -78,12 +92,30 @@ protected:
 };
 
 testF(Transform, steps_set) {
+    /* Transform steps should be set when transform is off when
+    controller.init is called. */
     assertNear(pixel->rTransformStep, 0.15, ERROR_BOUND);
     assertNear(pixel->gTransformStep, 0.5, ERROR_BOUND);
     assertNear(pixel->bTransformStep, -1.0, ERROR_BOUND);
 }
 
+testF(Transform, steps_unset_when_transform_off) {
+    /* Transform steps should not be set when transform is off when
+    controller.init is called. */
+    assertNear(pixel->rTransformStep, 0.15, ERROR_BOUND);
+    assertNear(pixel->gTransformStep, 0.5, ERROR_BOUND);
+    assertNear(pixel->bTransformStep, -1.0, ERROR_BOUND);
+    test_controller_loop_n_times(199);
+    test_controller.setTransform(false);
+    test_controller_loop_n_times(1);
+    assertNear(pixel->rTransformStep, 0.0, ERROR_BOUND);
+    assertNear(pixel->gTransformStep, 0.0, ERROR_BOUND);
+    assertNear(pixel->bTransformStep, 0.0, ERROR_BOUND);
+}
+
 testF(Transform, rgb_steps_stepping) {
+    /* rgbs values should increment by the product of their transform step and
+    the amount of calls to controller.loop. */
     assertEqual(pixel->r, 0.0);
     assertEqual(pixel->g, 100.0);
     assertEqual(pixel->b, 255.0);
@@ -106,6 +138,8 @@ testF(Transform, pixel_step_stepping) {
 }
 
 testF(Transform, cycle_interrupted) {
+    /* Transform cycle should implicitly run to completion when transform is
+    turned off during transform cycle. */
     // Assert starting color.
     assertEqual(pixel->r, 0.0);
     assertEqual(pixel->g, 100.0);
@@ -224,6 +258,8 @@ protected:
 };
 
 testF(Transform__twinkle_off, color_swap) {
+    /* Pixel colors should change to their target color after the controller
+    transforms steps reach 0 */
     Pixel *pixel_0 = &test_controller.pixels[0];
     Pixel *pixel_1 = &test_controller.pixels[1];
 
@@ -244,6 +280,7 @@ testF(Transform__twinkle_off, color_swap) {
     assertNear(pixel_1->b, 249.0, ERROR_BOUND);
 
     test_controller_loop_n_times(200);
+    assertEqual(pixel_0->transformStepsRemaining, 0);
 
     assertNear(pixel_0->r, 37.0, ERROR_BOUND);
     assertNear(pixel_0->g, 243.0, ERROR_BOUND);
@@ -255,6 +292,8 @@ testF(Transform__twinkle_off, color_swap) {
 }
 
 testF(Transform__twinkle_off, cycle_interrupted) {
+    /* All pixel color transitions should run to completion even when
+    controller.transform is turned off. */
     Pixel *pixel_0 = &test_controller.pixels[0];
     Pixel *pixel_1 = &test_controller.pixels[1];
 

@@ -25,6 +25,15 @@ test(two_controllers) {
 }
 
 
+test(idempotent_init) {
+    NeoPixelController test_controller;
+    for (byte i = 0; i < 10; i++)
+        test_controller.init(6, 10);
+    assertEqual(6, test_controller.strip.getPin());
+    assertEqual(10, test_controller.strip.numPixels());
+}
+
+
 class NeoPixelDefault: public aunit::TestOnce {
 protected:
     NeoPixelController test_controller;
@@ -157,6 +166,7 @@ testF(RGBs, test_controller_updateRGBS) {
     assertEqual(rgbs[8][1], 26);
     assertEqual(rgbs[8][2], 27);
 }
+
 
 void setup() {
     Serial.begin(115200);

@@ -30,6 +30,8 @@ void setRGBFromIndex() {
 }
 
 void setColorIndex(const byte index) {
+    if (index > NUM_COLORS - 1)
+        return;
     this->colorIndex = index;
 }
 void setColorRandom() {

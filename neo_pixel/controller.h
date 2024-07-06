@@ -22,6 +22,8 @@ bool transform = true;
 byte brightness = 255;
 
 void init(const byte dataPin, const byte numOfPixels) {
+    if (strip.numPixels()) return;
+
     strip.setPin(dataPin);
     strip.updateLength(numOfPixels);
     strip.updateType(NEO_GRB + NEO_KHZ800);
@@ -139,6 +141,7 @@ void setTransform(const bool transform) {
     this->transform = transform;
 };
 void settleAnyTransforms() {
+    /* Increment any transform cycles towards completion when transform is turned off. */
     for (byte i = 0; i < numOfPixels; i++) {
         Pixel *pixel = &pixels[i];
         if (!pixel->transformStepsRemaining)
@@ -149,6 +152,7 @@ void settleAnyTransforms() {
 }
 
 const byte applyBrightness(const float colorComponent, const float pixelBrightness) {
+    /* Apply controller brightness and pixel brightness to color components. */
     double result = colorComponent;
     result *= (double)this->brightness / (double)255.0;
     result *= pixelBrightness / (double)255.0;
@@ -156,6 +160,7 @@ const byte applyBrightness(const float colorComponent, const float pixelBrightne
 }
 
 void applyPixelSettingsToNeoPixel(const byte pixelIndex, const Pixel *pixel) {
+    /* Apply pixel settings to corresponding NeoPixel. */
     const uint32_t pixelColor = strip.Color(
         applyBrightness(pixel->r, pixel->brightness),
         applyBrightness(pixel->g, pixel->brightness),
@@ -165,6 +170,8 @@ void applyPixelSettingsToNeoPixel(const byte pixelIndex, const Pixel *pixel) {
 };
 
 void updateRGBS(String csvPalette) {
+    /* Change color palette and set new target colors to the corresponding the
+    color of the same color index used by each pixel when transform is on. */
     // Update palette.
     for (byte i = 0; i < PIXELS_LENGTH; i++) {
         const byte colorComponent = byte(csvPalette.substring(0, csvPalette.indexOf(',')).toInt());

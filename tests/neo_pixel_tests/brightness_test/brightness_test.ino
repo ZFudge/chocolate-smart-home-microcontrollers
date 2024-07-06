@@ -335,7 +335,7 @@ protected:
 };
 
 testF(Brightness__ControllerOff_TwinkleOff_TransformOff__BrightenedPixels, brightness_down) {
-    /* pixel.brightness should decrement on each controller.loop when 
+    /* pixel.brightness should decrement on each controller.loop when
     pixel.brightness > controller.brightness, until
     ALL_PIXELS_BRIGHTNESS_ARE_CURRENT is true, even when controller is off.
     Controller  off
@@ -561,7 +561,7 @@ testF(RGBs_1, controller_brightness_full_rgbs) {
 }
 
 testF(RGBs_1, controller_brightness_dims_rgbs) {
-    /* rgb values used in controller.strip should be the same intensity as 
+    /* rgb values used in controller.strip should be the same intensity as
     controller.brightness, when pixel.brightness is at max */
     test_controller.brightness = 234;
     test_controller.applyPixelSettingsToNeoPixel(0, pixel);

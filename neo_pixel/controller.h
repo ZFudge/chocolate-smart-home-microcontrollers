@@ -59,19 +59,15 @@ void loop() {
                 bool DONE_CHANGING_BRIGHTNESS = true;
                 for (byte i = 0; i < numOfPixels; i++) {
                     Pixel *pixel = &pixels[i];
-                    if (pixel->brightness < this->brightness) {
+                    if (pixel->brightness < this->brightness)
                         pixel->brightness++;
-                    } else if (pixel->brightness > this->brightness) {
+                    else if (pixel->brightness > this->brightness)
                         pixel->brightness--;
-                    }
                     if (pixel->brightness != this->brightness)
                         DONE_CHANGING_BRIGHTNESS = false;
-                    if (!this->transform) {
-                        if (pixel->transformStepsRemaining)
-                            pixel->transform(this->transform);
+                    if (!this->transform)
                         // No twinkling or color transforms. Just apply brightness.
                         this->applyPixelSettingsToNeoPixel(i, pixel);
-                    }
                 }
                 if (DONE_CHANGING_BRIGHTNESS)
                     this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
@@ -85,12 +81,9 @@ void loop() {
                     pixel->brightness--;
                 if (pixel->brightness)
                     DONE_TURNING_OFF = false;
-                if (!this->transform) {
-                    if (pixel->transformStepsRemaining)
-                        pixel->transform(this->transform);
+                if (!this->transform)
                     // Transform false. Twinkling won't apply when controller is off. Just apply brightness. """
                     this->applyPixelSettingsToNeoPixel(i, pixel);
-                }
             }
             if (DONE_TURNING_OFF)
                 this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
@@ -131,6 +124,12 @@ void turnOnOff(const bool on) {
 void setBrightness(const byte brightness) {
     if (brightness == this->brightness)
         return;
+    // If brightness setting would be dark enough to appear as though the
+    // controller is turned off, just turn it off instead.
+    if (brightness <= MIN_TWINKLE_BRIGHTNESS_THRESHOLD) {
+        this->turnOnOff(false);
+        return;
+    }
     this->brightness = brightness;
     this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 };
@@ -139,10 +138,10 @@ void setTwinkle(const bool twinkle) {
 
     if (twinkle) return;
     // Trigger brightness of pixels settling at controller brightness setting.
-        for (byte i = 0; i < numOfPixels; i++) {
-            if (pixels[i].brightness != this->brightness) {
-                ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
-                break;
+    for (byte i = 0; i < numOfPixels; i++) {
+        if (pixels[i].brightness != this->brightness) {
+            ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+            break;
         }
     }
 };
@@ -160,10 +159,12 @@ void settleAnyTransforms() {
     }
 }
 
-const byte applyBrightness(const float colorComponent, const float pixelBrightness) {
+const byte applyBrightness(const float colorComponent, const double pixelBrightness) {
     /* Apply controller brightness and pixel brightness to color components. */
     double result = colorComponent;
+    // Apply controller brightness.
     result *= (double)this->brightness / (double)255.0;
+    // Apply pixel brightness.
     result *= pixelBrightness / (double)255.0;
     return round(result);
 }
@@ -178,7 +179,7 @@ void applyPixelSettingsToNeoPixel(const byte pixelIndex, const Pixel *pixel) {
     this->strip.setPixelColor(pixelIndex, pixelColor);
 };
 
-void updateRGBS(String csvPalette) {
+void updateRGBs(String csvPalette) {
     /* Change color palette and set new target colors to the corresponding the
     color of the same color index used by each pixel when transform is on. */
     // Update palette.
@@ -190,9 +191,18 @@ void updateRGBS(String csvPalette) {
     // Update any transform color targets.
     for (byte i = 0; i < numOfPixels; i++) {
         Pixel *pixel = &pixels[i];
-        if (!this->transform && !pixel->transformStepsRemaining)
-            continue;
-        pixel->setNewTransformTargetFromCurrentState();
+        if (this->on) {
+            if (this->transform || pixel->transformStepsRemaining) {
+                pixel->setNewTransformTargetFromCurrentState();
+            } else if (!this->transform && !this->twinkle) {
+                // Force smooth transition when controller is on but no
+                // graceful way to
+                pixel->transformStepsRemaining = 200;
+                pixel->setNewTransformTargetFromCurrentState();
+            }
+        } else {
+            pixel->setRGBFromIndex();
+        }
     }
 }
 

@@ -13,6 +13,7 @@ using namespace NeoPixel;
 
 
 const double ERROR_BOUND = 0.00075;
+
 byte getColorIndex1(byte colorIndex) { return 1; };
 byte getColorIndex0(byte colorIndex) { return 0; };
 byte getColorIndex2(byte colorIndex) { return 2; };
@@ -196,7 +197,7 @@ testF(Transform, color_reset_during_cycle) {
 
     // Interrupt transform cycle by updating color palette.
     // This triggers an update to the transform values.
-    test_controller.updateRGBS("0,0,0,115,75,160,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0");
+    test_controller.updateRGBs("0,0,0,115,75,160,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0");
     // New transform steps from the current state to the new target color.
     assertEqual(pixel->colorIndex, 1);
     assertNear(pixel->rTransformStep, 1.0, ERROR_BOUND);
@@ -211,12 +212,12 @@ testF(Transform, color_reset_during_cycle) {
 
     // Interrupt transform cycle again by updating color palette, again.
     // This triggers the second update to the transform values.
-    test_controller.updateRGBS("0,0,0,1,100,255,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0");
+    test_controller.updateRGBs("0,0,0,1,100,255,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0");
     assertNear(pixel->rTransformStep, -1.28, ERROR_BOUND);
     assertNear(pixel->gTransformStep, -0.25, ERROR_BOUND);
     assertNear(pixel->bTransformStep, 1.95, ERROR_BOUND);
     test_controller_loop_n_times(50);
-    // Ending color, as set by test_control.updateRGBS.
+    // Ending color, as set by test_control.updateRGBs.
     assertNear(pixel->r, 1.0, ERROR_BOUND);
     assertNear(pixel->g, 100.0, ERROR_BOUND);
     assertNear(pixel->b, 255.0, ERROR_BOUND);
@@ -330,6 +331,95 @@ testF(Transform__twinkle_off, cycle_interrupted) {
     assertNear(pixel_0->r, 37.0, ERROR_BOUND);
     assertNear(pixel_0->g, 243.0, ERROR_BOUND);
     assertNear(pixel_0->b, 249.0, ERROR_BOUND);
+}
+
+
+class TransformToSameComponents: public aunit::TestOnce, public TestNeoPixelController {
+protected:
+    Pixel *pixel;
+    void setup() override {
+        aunit::TestOnce::setup();
+        rgbs[0][0] = 0;
+        rgbs[0][1] = 100;
+        rgbs[0][2] = 55;
+
+        rgbs[1][0] = 0;
+        rgbs[1][1] = 200;
+        rgbs[1][2] = 55;
+
+        test_controller.init(TEST_DATA_PIN, 1);
+
+        pixel = &test_controller.pixels[0];
+        pixel->colorIndex = 0;
+        pixel->setRGBFromIndex();
+        pixel->getColorIndexRandom = getColorIndex1;
+        pixel->getTransformStepsRemainingRandom = getTransformStepsRemaining200;
+        pixel->setNewTransform();
+    }
+};
+
+testF(TransformToSameComponents, same_color_components) {
+    /* rgbs steps should have a value of 0.0 when value is equal to the target color component. */
+    assertEqual(pixel->r, 0.0);
+    assertEqual(pixel->g, 100.0);
+    assertEqual(pixel->b, 55.0);
+
+    assertEqual(pixel->rTransformStep, 0.0);
+    assertEqual(pixel->gTransformStep, 0.5);
+    assertEqual(pixel->bTransformStep, 0.0);
+
+    test_controller_loop_n_times(100);
+
+    assertEqual(pixel->rTransformStep, 0.0);
+    assertEqual(pixel->gTransformStep, 0.5);
+    assertEqual(pixel->bTransformStep, 0.0);
+    assertEqual(pixel->r, 0.0);
+    assertEqual(pixel->g, 150.0);
+    assertEqual(pixel->b, 55.0);
+
+    test_controller_loop_n_times(100);
+
+    assertEqual(pixel->rTransformStep, 0.0);
+    assertEqual(pixel->gTransformStep, 0.5);
+    assertEqual(pixel->bTransformStep, 0.0);
+    assertEqual(pixel->r, 0.0);
+    assertEqual(pixel->g, 200.0);
+    assertEqual(pixel->b, 55.0);
+}
+
+
+class TransformOffTwinkleOffControllerOff: public aunit::TestOnce, public TestNeoPixelController {
+protected:
+    Pixel *pixel;
+    void setup() override {
+        aunit::TestOnce::setup();
+        rgbs[0][0] = 0;
+        rgbs[0][1] = 100;
+        rgbs[0][2] = 255;
+
+        test_controller.init(TEST_DATA_PIN, 1);
+        test_controller.on = false;
+        test_controller.twinkle = false;
+        test_controller.transform = false;
+
+        pixel = &test_controller.pixels[0];
+        pixel->colorIndex = 0;
+        pixel->setRGBFromIndex();
+    }
+};
+
+testF(TransformOffTwinkleOffControllerOff, updateRGBs_no_transform_when_controller_off) {
+    /* pixel rgbs should instantaneously change to the corresponding color of
+    the same color index in the new palette. */
+    assertNear(pixel->r, 0.0, ERROR_BOUND);
+    assertNear(pixel->g, 100.0, ERROR_BOUND);
+    assertNear(pixel->b, 255.0, ERROR_BOUND);
+
+    test_controller.updateRGBs("115,75,160,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0");
+
+    assertNear(pixel->r, 115.0, ERROR_BOUND);
+    assertNear(pixel->g, 75.0, ERROR_BOUND);
+    assertNear(pixel->b, 160.0, ERROR_BOUND);
 }
 
 

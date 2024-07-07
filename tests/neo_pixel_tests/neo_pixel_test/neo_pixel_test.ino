@@ -25,6 +25,24 @@ test(two_controllers) {
 }
 
 
+test(high_number_of_pixels) {
+    NeoPixelController test_controller_100;
+    test_controller_100.init(6, 100);
+
+    NeoPixelController test_controller_200;
+    test_controller_200.init(7, 200);
+
+    NeoPixelController test_controller_255;
+    test_controller_255.init(8, 255);
+
+    for (byte i = 0; i < 10; i++) {
+        test_controller_100.loop();
+        test_controller_200.loop();
+        test_controller_255.loop();
+    }
+}
+
+
 test(idempotent_init) {
     NeoPixelController test_controller;
     for (byte i = 0; i < 10; i++)
@@ -47,6 +65,18 @@ testF(NeoPixelDefault, turn_off) {
     assertTrue(test_controller.on);
     test_controller.turnOnOff(false);
     assertFalse(test_controller.on);
+}
+
+testF(NeoPixelDefault, implicitly_turn_off) {
+    /* Controller should be implicitly turned off when brightness is set
+    to a low enough setting, leaving the former brightness level intact */
+    assertTrue(test_controller.on);
+    assertEqual(test_controller.brightness, 255);
+
+    test_controller.setBrightness(4);
+
+    assertFalse(test_controller.on);
+    assertEqual(test_controller.brightness, 255);
 }
 
 testF(NeoPixelDefault, setBrightness) {
@@ -130,13 +160,13 @@ protected:
     }
 };
 
-testF(RGBs, test_controller_updateRGBS) {
+testF(RGBs, test_controller_updateRGBs) {
     assertEqual(rgbs[0][0], 0);
     assertEqual(rgbs[3][2], 110);
     assertEqual(rgbs[6][2], 200);
     assertEqual(rgbs[8][1], 250);
 
-    test_controller.updateRGBS("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27");
+    test_controller.updateRGBs("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27");
 
     assertEqual(rgbs[0][0], 1);
     assertEqual(rgbs[0][1], 2);

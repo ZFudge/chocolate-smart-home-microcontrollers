@@ -5,6 +5,9 @@
 #include "utils.h"
 
 
+const byte MIN_TWINKLE_BRIGHTNESS_THRESHOLD = 5;
+
+
 struct Pixel : public Utils::PixelUtils {
 
 float r, g, b;
@@ -17,7 +20,6 @@ byte targetBrightness;
 byte transformStepsRemaining;
 double rTransformStep, gTransformStep, bTransformStep;
 
-const byte MIN_TWINKLE_BRIGHTNESS_THRESHOLD = 5;
 
 Pixel() {
     setColorRandomAny();

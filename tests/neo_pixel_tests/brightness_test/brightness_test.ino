@@ -35,10 +35,6 @@ protected:
         for (byte i = 0; i < TEST_NUM_PIX; i++)
             test_controller.pixels[i].brightness = 255;
     }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
-    }
 };
 
 testF(Brightness__ControllerOn__Twinkle__Transform__BrightenedPixels, brightness_down) {
@@ -74,10 +70,6 @@ protected:
 
         for (byte i = 0; i < TEST_NUM_PIX; i++)
             test_controller.pixels[i].brightness = 255;
-    }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
     }
 };
 
@@ -115,10 +107,6 @@ protected:
         for (byte i = 0; i < TEST_NUM_PIX; i++)
             test_controller.pixels[i].brightness = 255;
     }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
-    }
 };
 
 testF(Brightness__ControllerOn__TwinkleOff__Transform__BrightenedPixels, brightness_down) {
@@ -154,10 +142,6 @@ protected:
 
         for (byte i = 0; i < TEST_NUM_PIX; i++)
             test_controller.pixels[i].brightness = 255;
-    }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
     }
 };
 
@@ -196,10 +180,6 @@ protected:
         for (byte i = 0; i < TEST_NUM_PIX; i++)
             test_controller.pixels[i].brightness = 255;
     }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
-    }
 };
 
 testF(Brightness__ControlleOff_Twinkle_Transform__BrightenedPixels, brightness_down) {
@@ -237,10 +217,6 @@ protected:
 
         for (byte i = 0; i < TEST_NUM_PIX; i++)
             test_controller.pixels[i].brightness = 255;
-    }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
     }
 };
 
@@ -283,10 +259,6 @@ protected:
         for (byte i = 0; i < TEST_NUM_PIX; i++)
             test_controller.pixels[i].brightness = 255;
     }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
-    }
 };
 
 testF(Brightness__ControllerOff_Twinkle_TransformOff__BrightenedPixels, brightness_down) {
@@ -327,10 +299,6 @@ protected:
 
         for (byte i = 0; i < TEST_NUM_PIX; i++)
             test_controller.pixels[i].brightness = 255;
-    }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
     }
 };
 
@@ -377,10 +345,6 @@ protected:
         for (byte i = 0; i < TEST_NUM_PIX; i++)
             test_controller.pixels[i].targetBrightness = 255;
     }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
-    }
 };
 
 testF(Brightness__ControllerOn_Twinkle_Transform__DimmedPixels, brightness_up) {
@@ -415,10 +379,6 @@ protected:
 
         for (byte i = 0; i < TEST_NUM_PIX; i++)
             test_controller.pixels[i].targetBrightness = 255;
-    }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
     }
 };
 
@@ -455,10 +415,6 @@ protected:
         for (byte i = 0; i < TEST_NUM_PIX; i++)
             test_controller.pixels[i].setTargetBrightness(255);
     }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
-    }
 };
 
 testF(Brightness__ControllerOn_TwinkleOff_Transform__DimmedPixels, brightness_up) {
@@ -494,10 +450,6 @@ protected:
         for (byte i = 0; i < TEST_NUM_PIX; i++)
             test_controller.pixels[i].targetBrightness = 255;
     }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
-    }
 };
 
 testF(Brightness__ControllerOn_TwinkleOff_TransformOff__DimmedPixels, brightness_up) {
@@ -521,7 +473,6 @@ testF(Brightness__ControllerOn_TwinkleOff_TransformOff__DimmedPixels, brightness
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 /* START controller.brightness determines resulting RGB values */
 
 class RGBs_1: public aunit::TestOnce {
@@ -540,12 +491,7 @@ protected:
         pixel->b = 55;
         pixel->brightness = 255;
     }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
-    }
 };
-
 
 testF(RGBs_1, controller_brightness_full_rgbs) {
     /* rgb values should remain the same when controller brightness and pixel
@@ -653,10 +599,6 @@ protected:
         pixel->r = 5;
         pixel->g = 167;
         pixel->b = 255;
-    }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
     }
 };
 

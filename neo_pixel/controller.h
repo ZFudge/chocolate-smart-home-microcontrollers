@@ -136,6 +136,15 @@ void setBrightness(const byte brightness) {
 };
 void setTwinkle(const bool twinkle) {
     this->twinkle = twinkle;
+
+    if (twinkle) return;
+    // Trigger brightness of pixels settling at controller brightness setting.
+        for (byte i = 0; i < numOfPixels; i++) {
+            if (pixels[i].brightness != this->brightness) {
+                ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+                break;
+        }
+    }
 };
 void setTransform(const bool transform) {
     this->transform = transform;

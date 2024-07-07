@@ -60,6 +60,18 @@ testF(NeoPixelDefault, setBrightness) {
     assertEqual(test_controller.brightness, 44);
 }
 
+testF(NeoPixelDefault, applyBrightness) {
+    assertEqual(test_controller.applyBrightness(255, 255), 255);
+    assertEqual(test_controller.applyBrightness(255, 127), 127);
+    assertEqual(test_controller.applyBrightness(255, 85 ), 85);
+    assertEqual(test_controller.applyBrightness(255, 0  ), 0);
+    assertEqual(test_controller.applyBrightness(0,   255), 0);
+    assertEqual(test_controller.applyBrightness(0,   0  ), 0);
+    assertEqual(test_controller.applyBrightness(100, 0  ), 0);
+    assertEqual(test_controller.applyBrightness(100, 127), 50);
+    assertEqual(test_controller.applyBrightness(100, 85 ), 33);
+}
+
 
 class NeoPixelOff: public aunit::TestOnce {
 protected:
@@ -115,10 +127,6 @@ protected:
         rgbs[8][0] = 240;
         rgbs[8][1] = 250;
         rgbs[8][2] = 255;
-    }
-
-    void teardown() override {
-        aunit::TestOnce::teardown();
     }
 };
 

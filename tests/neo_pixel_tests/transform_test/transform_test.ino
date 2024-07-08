@@ -92,6 +92,10 @@ protected:
     }
 };
 
+testF(Transform, all_pixels_transform_cycles_are_current_false_by_the_fault) {
+    assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
+}
+
 testF(Transform, steps_set) {
     /* Transform steps should be set when transform is off when
     controller.init is called. */

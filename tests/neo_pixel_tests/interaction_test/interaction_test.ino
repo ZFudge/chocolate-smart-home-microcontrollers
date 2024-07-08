@@ -181,6 +181,7 @@ testF(Simultaneous, interactions) {
     /* Test transforms cycles settling after turning off transform. */
     assertFalse(test_controller.twinkle);
     assertTrue(test_controller.transform);
+    assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
     test_controller.setTransform(false);
 
     test_controller_loop_n_times(4);
@@ -204,6 +205,7 @@ testF(Simultaneous, interactions) {
     // Test that step values and RGB values are correct after running all
     // transform cycles to completion.
     test_controller_loop_n_times(185);
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
 
     assertEqual(p_1->brightness, 150);
     assertEqual(p_2->brightness, 150);
@@ -232,9 +234,11 @@ testF(Simultaneous, interactions) {
     /* Test that twinkle and transform setters are idempotent. */
     test_controller.setTwinkle(false);
     test_controller.setTransform(false);
+    assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
 
     test_controller_loop_n_times(1000);
 
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
     assertEqual(p_1->brightness, 150);
     assertNear(p_1->rTransformStep, 0.0, ERROR_BOUND);
     assertNear(p_2->gTransformStep, 0.0, ERROR_BOUND);
@@ -336,6 +340,7 @@ testF(Simultaneous, interactions) {
     assertEqual(2, byte(pixelColor >> 8 & 255));
     assertEqual(3, byte(pixelColor & 255));
 
+    // Twinkle on.
     test_controller.setTwinkle(true);
     assertEqual(p_1->targetBrightness, 140);
     assertEqual(p_2->targetBrightness, 99);
@@ -374,7 +379,10 @@ testF(Simultaneous, interactions) {
     assertEqual(p_3->targetBrightness, 79);
     p_3->getTargetBrightnessInRange = getTargetBrightnessInRange20;
 
+    // Transform on.
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
     test_controller.setTransform(true);
+    assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
     p_1->getTransformStepsRemainingRandom = getTransformStepsRemaining100;
     p_2->getTransformStepsRemainingRandom = getTransformStepsRemaining100;
     p_3->getTransformStepsRemainingRandom = getTransformStepsRemaining100;
@@ -423,7 +431,11 @@ testF(Simultaneous, interactions) {
     assertEqual(p_2->targetBrightness, 20);
     assertEqual(p_3->targetBrightness, 20);
 
+    ///////////////////////////////////////////////////////////////////////////
+    /* Test dimming cycle when twinkle and transform are both on. */ 
     test_controller.turnOnOff(false);
+    assertTrue(test_controller.twinkle);
+    assertTrue(test_controller.transform);
     test_controller_loop_n_times(61);
     assertEqual(p_3->brightness, 0);
     test_controller_loop_n_times(78);
@@ -434,11 +446,17 @@ testF(Simultaneous, interactions) {
     assertNear(p_2->g, 10.0, ERROR_BOUND);
     assertNear(p_3->b, 50.0, ERROR_BOUND);
 
+    ///////////////////////////////////////////////////////////////////////////
+    /* Test turning twinkle and transform off with controller already off, then
+    turning controller on. */
     test_controller.setTwinkle(false);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
     test_controller.setTransform(false);
+    assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
     test_controller.turnOnOff(true);
 
     test_controller_loop_n_times(1000);
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
     assertEqual(p_1->brightness, 150);
     assertEqual(p_2->brightness, 150);
     assertEqual(p_3->brightness, 150);
@@ -456,7 +474,11 @@ testF(Simultaneous, interactions) {
     p_2->getColorIndexRandom = getColorIndex1;
     p_3->getColorIndexRandom = getColorIndex2;
 
+    ///////////////////////////////////////////////////////////////////////////
+    /* Turn transform on, from non-transitive controller state. */
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
     test_controller.setTransform(true);
+    assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
 
     test_controller.loop();
 
@@ -470,7 +492,9 @@ testF(Simultaneous, interactions) {
     assertNear(p_2->g, 10.6, ERROR_BOUND);
     assertNear(p_3->b, 50.6, ERROR_BOUND);
 
+    assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
     test_controller.setTransform(false);
+    assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
 
     test_controller_loop_n_times(49);
 
@@ -484,6 +508,7 @@ testF(Simultaneous, interactions) {
     assertEqual(p_1->brightness, 222);
     assertEqual(p_2->brightness, 222);
     assertEqual(p_3->brightness, 222);
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
 
     // Implicitly turn controller off using low brightness setting
     assertTrue(test_controller.on);

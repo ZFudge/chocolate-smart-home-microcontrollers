@@ -100,8 +100,8 @@ void setNewTransformTargetFromCurrentState() {
     this->b = b1;
 }
 
-void transform(const bool controllerTransform) {
-    if (transformStepsRemaining <= 0)
+void transform(const bool controllerOn, const bool controllerTransform) {
+    if (transformStepsRemaining <= 0 && controllerOn)
         setNewTransform();
 
     this->r += rTransformStep;
@@ -110,7 +110,7 @@ void transform(const bool controllerTransform) {
     this->transformStepsRemaining--;
 
     // Unset steps when transform is off and transform cycle has finished.
-    if (!controllerTransform && transformStepsRemaining == 0) {
+    if ((!controllerOn || !controllerTransform) && transformStepsRemaining == 0) {
         this->rTransformStep = 0.0;
         this->gTransformStep = 0.0;
         this->bTransformStep = 0.0;

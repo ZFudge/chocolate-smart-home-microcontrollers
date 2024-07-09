@@ -109,12 +109,16 @@ testF(Simultaneous, interactions) {
     assertNear(p_3->rTransformStep, -0.3, ERROR_BOUND);
     assertNear(p_3->gTransformStep, -0.3, ERROR_BOUND);
     assertNear(p_3->bTransformStep, -0.3, ERROR_BOUND);
+    assertEqual(p_1->transformStepsRemaining, 200);
+    assertEqual(p_2->transformStepsRemaining, 200);
+    assertEqual(p_3->transformStepsRemaining, 200);
 
     test_controller_loop_n_times(5);
 
     /* Pixel One */
     assertEqual(p_1->brightness, 105);
     assertEqual(p_1->targetBrightness, 140);
+    assertEqual(p_1->transformStepsRemaining, 195);
     assertNear(p_1->r, 0.75, ERROR_BOUND);
     assertNear(p_1->g, 10.75, ERROR_BOUND);
     assertNear(p_1->b, 20.75, ERROR_BOUND);
@@ -127,6 +131,7 @@ testF(Simultaneous, interactions) {
     /* Pixel Two Start */
     assertEqual(p_2->brightness, 105);
     assertEqual(p_2->targetBrightness, 99);
+    assertEqual(p_2->transformStepsRemaining, 195);
     assertNear(p_2->r, 30.75, ERROR_BOUND);
     assertNear(p_2->g, 40.75, ERROR_BOUND);
     assertNear(p_2->b, 50.75, ERROR_BOUND);
@@ -139,6 +144,7 @@ testF(Simultaneous, interactions) {
     /* Pixel Three Start */
     assertEqual(p_3->brightness, 95);
     assertEqual(p_3->targetBrightness, 101);
+    assertEqual(p_3->transformStepsRemaining, 195);
     assertNear(p_3->r, 58.5, ERROR_BOUND);
     assertNear(p_3->g, 68.5, ERROR_BOUND);
     assertNear(p_3->b, 78.5, ERROR_BOUND);
@@ -160,14 +166,17 @@ testF(Simultaneous, interactions) {
     test_controller_loop_n_times(5);
 
     assertEqual(p_1->brightness, 110);
+    assertEqual(p_1->transformStepsRemaining, 190);
     assertNear(p_1->r, 1.5, ERROR_BOUND);
     assertNear(p_1->g, 11.5, ERROR_BOUND);
     assertNear(p_1->b, 21.5, ERROR_BOUND);
     assertEqual(p_2->brightness, 110);
+    assertEqual(p_2->transformStepsRemaining, 190);
     assertNear(p_2->r, 31.5, ERROR_BOUND);
     assertNear(p_2->g, 41.5, ERROR_BOUND);
     assertNear(p_2->b, 51.5, ERROR_BOUND);
     assertEqual(p_3->brightness, 100);
+    assertEqual(p_3->transformStepsRemaining, 190);
     assertNear(p_3->r, 57.0, ERROR_BOUND);
     assertNear(p_3->g, 67.0, ERROR_BOUND);
     assertNear(p_3->b, 77.0, ERROR_BOUND);
@@ -183,19 +192,23 @@ testF(Simultaneous, interactions) {
     assertTrue(test_controller.transform);
     assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
     test_controller.setTransform(false);
+    assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
 
     test_controller_loop_n_times(4);
 
     // Transform cycles still stepping.
     assertEqual(p_1->brightness, 115);
+    assertEqual(p_1->transformStepsRemaining, 185);
     assertNear(p_1->r, 2.25, ERROR_BOUND);
     assertNear(p_1->g, 12.25, ERROR_BOUND);
     assertNear(p_1->b, 22.25, ERROR_BOUND);
     assertEqual(p_2->brightness, 115);
+    assertEqual(p_2->transformStepsRemaining, 185);
     assertNear(p_2->r, 32.25, ERROR_BOUND);
     assertNear(p_2->g, 42.25, ERROR_BOUND);
     assertNear(p_2->b, 52.25, ERROR_BOUND);
     assertEqual(p_3->brightness, 105);
+    assertEqual(p_3->transformStepsRemaining, 185);
     assertNear(p_3->r, 55.5, ERROR_BOUND);
     assertNear(p_3->g, 65.5, ERROR_BOUND);
     assertNear(p_3->b, 75.5, ERROR_BOUND);
@@ -205,11 +218,13 @@ testF(Simultaneous, interactions) {
     // Test that step values and RGB values are correct after running all
     // transform cycles to completion.
     test_controller_loop_n_times(185);
-    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
 
     assertEqual(p_1->brightness, 150);
     assertEqual(p_2->brightness, 150);
     assertEqual(p_3->brightness, 150);
+    assertEqual(p_1->transformStepsRemaining, 0);
+    assertEqual(p_2->transformStepsRemaining, 0);
+    assertEqual(p_3->transformStepsRemaining, 0);
     assertNear(p_1->rTransformStep, 0.0, ERROR_BOUND);
     assertNear(p_1->gTransformStep, 0.0, ERROR_BOUND);
     assertNear(p_1->bTransformStep, 0.0, ERROR_BOUND);
@@ -236,9 +251,12 @@ testF(Simultaneous, interactions) {
     test_controller.setTransform(false);
     assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
 
+    test_controller_loop_n_times(10);
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
+
     test_controller_loop_n_times(1000);
 
-    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
     assertEqual(p_1->brightness, 150);
     assertNear(p_1->rTransformStep, 0.0, ERROR_BOUND);
     assertNear(p_2->gTransformStep, 0.0, ERROR_BOUND);
@@ -246,6 +264,9 @@ testF(Simultaneous, interactions) {
     assertNear(p_1->r, 30.0, ERROR_BOUND);
     assertNear(p_2->g, 70.0, ERROR_BOUND);
     assertNear(p_3->b, 20.0, ERROR_BOUND);
+    assertEqual(p_1->transformStepsRemaining, 0);
+    assertEqual(p_2->transformStepsRemaining, 0);
+    assertEqual(p_3->transformStepsRemaining, 0);
 
     ///////////////////////////////////////////////////////////////////////////
     /* Test that dimming cycle works when twinkle and transform settings are off. */
@@ -296,6 +317,9 @@ testF(Simultaneous, interactions) {
     assertEqual(p_1->brightness, 0);
     assertEqual(p_2->brightness, 0);
     assertEqual(p_3->brightness, 0);
+    assertEqual(p_1->transformStepsRemaining, 0);
+    assertEqual(p_2->transformStepsRemaining, 0);
+    assertEqual(p_3->transformStepsRemaining, 0);
     assertNear(p_1->rTransformStep, 0.0, ERROR_BOUND);
     assertNear(p_2->gTransformStep, 0.0, ERROR_BOUND);
     assertNear(p_3->bTransformStep, 0.0, ERROR_BOUND);
@@ -397,6 +421,9 @@ testF(Simultaneous, interactions) {
     assertNear(p_1->rTransformStep, 0.3, ERROR_BOUND);
     assertNear(p_2->gTransformStep, -0.6, ERROR_BOUND);
     assertNear(p_3->bTransformStep, 0.3, ERROR_BOUND);
+    assertEqual(p_1->transformStepsRemaining, 99);
+    assertEqual(p_2->transformStepsRemaining, 99);
+    assertEqual(p_3->transformStepsRemaining, 99);
     assertNear(p_1->r, 30.3, ERROR_BOUND);
     assertNear(p_1->g, 40.3, ERROR_BOUND);
     assertNear(p_1->b, 50.3, ERROR_BOUND);
@@ -422,6 +449,9 @@ testF(Simultaneous, interactions) {
     assertEqual(p_1->targetBrightness, 140);
     assertEqual(p_2->targetBrightness, 140);
     assertEqual(p_3->targetBrightness, 20);
+    assertEqual(p_1->transformStepsRemaining, 62);
+    assertEqual(p_2->transformStepsRemaining, 62);
+    assertEqual(p_3->transformStepsRemaining, 62);
 
     test_controller.loop();
     assertEqual(p_1->brightness, 139);
@@ -434,14 +464,29 @@ testF(Simultaneous, interactions) {
     ///////////////////////////////////////////////////////////////////////////
     /* Test dimming cycle when twinkle and transform are both on. */ 
     test_controller.turnOnOff(false);
+    assertFalse(test_controller.on);
     assertTrue(test_controller.twinkle);
     assertTrue(test_controller.transform);
     test_controller_loop_n_times(61);
+    assertFalse(test_controller.on);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
+    assertEqual(p_1->brightness, 78);
+    assertEqual(p_2->brightness, 78);
     assertEqual(p_3->brightness, 0);
+    assertEqual(p_1->transformStepsRemaining, 0);
+    assertEqual(p_2->transformStepsRemaining, 0);
+    assertEqual(p_3->transformStepsRemaining, 0);
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
     test_controller_loop_n_times(78);
+    assertFalse(test_controller.on);
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
     assertEqual(p_1->brightness, 0);
     assertEqual(p_2->brightness, 0);
     assertEqual(p_3->brightness, 0);
+    assertEqual(p_1->transformStepsRemaining, 0);
+    assertEqual(p_2->transformStepsRemaining, 0);
+    assertEqual(p_3->transformStepsRemaining, 0);
     assertNear(p_1->r, 60.0, ERROR_BOUND);
     assertNear(p_2->g, 10.0, ERROR_BOUND);
     assertNear(p_3->b, 50.0, ERROR_BOUND);
@@ -451,8 +496,11 @@ testF(Simultaneous, interactions) {
     turning controller on. */
     test_controller.setTwinkle(false);
     assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
     test_controller.setTransform(false);
-    assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
+    // Turning transform off at the end of transform cycles
+    // ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT unaffected.
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
     test_controller.turnOnOff(true);
 
     test_controller_loop_n_times(1000);
@@ -515,7 +563,6 @@ testF(Simultaneous, interactions) {
     test_controller.setBrightness(4);
     assertFalse(test_controller.on);
     assertEqual(test_controller.brightness, 222);
-
 
 }
 

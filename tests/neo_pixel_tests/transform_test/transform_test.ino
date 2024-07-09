@@ -85,6 +85,7 @@ protected:
 
         pixel = &test_controller.pixels[0];
         pixel->colorIndex = 0;
+        pixel->targetBrightness = 255;
         pixel->setRGBFromIndex();
         pixel->getColorIndexRandom = getColorIndex1;
         pixel->getTransformStepsRemainingRandom = getTransformStepsRemaining200;
@@ -94,6 +95,68 @@ protected:
 
 testF(Transform, all_pixels_transform_cycles_are_current_false_by_the_fault) {
     assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
+}
+
+testF(Transform, all_pixels_transform_cycles_are_current_is_true_after_transform_turned_off_and_cycle_settled) {
+    /* ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT should be true as soon as
+    transform cycle(s) complete */
+    test_controller.setTransform(false);
+    test_controller_loop_n_times(199);
+
+    assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
+    test_controller.loop();
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
+}
+
+testF(Transform, all_pixels_transform_cycles_are_current_is_true_after_controller_turned_off_and_cycle_settled) {
+    /* ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT should be true and remain true
+    after the controller is turned off and current transform cycle settles,
+    even though the controller is not fully dimmed yet and transform setting
+    remains on. */
+
+    // Complete 190/200 transform steps in the current cycle.
+    assertEqual(pixel->transformStepsRemaining, 200);
+    assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
+    test_controller_loop_n_times(190);
+
+    // Start dimming cycle before transform has settled.
+    test_controller.turnOnOff(false);
+
+    // Complete transform cycle.
+    test_controller_loop_n_times(10);
+
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
+
+    assertEqual(pixel->transformStepsRemaining, 0);
+    assertEqual(pixel->brightness, 180);
+    for (byte i = 0; i < 180; i++) {
+        test_controller.loop();
+        assertEqual(pixel->transformStepsRemaining, 0);
+    }
+
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
+}
+
+testF(Transform, transform_cycles_settle_after_controller_turned_off) {
+    /* Unsettled transform cycles should still settle after the controller has
+    finished turning off. */
+    test_controller_loop_n_times(20);
+    assertEqual(pixel->brightness, 20);
+    assertEqual(pixel->transformStepsRemaining, 180);
+
+    test_controller.turnOnOff(false);
+
+    test_controller_loop_n_times(20);
+    assertEqual(pixel->brightness, 0);
+    assertEqual(pixel->transformStepsRemaining, 160);
+
+    test_controller_loop_n_times(160);
+    assertEqual(pixel->brightness, 0);
+    assertEqual(pixel->transformStepsRemaining, 0);
+    assertNear(pixel->rTransformStep, 0.0, ERROR_BOUND);
+    assertNear(pixel->gTransformStep, 0.0, ERROR_BOUND);
+    assertNear(pixel->bTransformStep, 0.0, ERROR_BOUND);
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
 }
 
 testF(Transform, steps_set) {
@@ -261,6 +324,36 @@ protected:
         test_controller.pixels[1].setNewTransform();
     }
 };
+
+testF(Transform__twinkle_off, all_pixels_transform_cycles_are_current_is_true_after_controller_turned_off_and_cycle_settled) {
+    /* ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT should be true and remain true
+    after the controller is turned off and current transform cycle settles,
+    even though the controller is not fully dimmed yet and transform setting
+    remains on. */
+    Pixel *pixel = &test_controller.pixels[0];
+
+    // Complete 190/200 transform steps in the current cycle.
+    assertEqual(pixel->transformStepsRemaining, 200);
+    assertFalse(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
+    test_controller_loop_n_times(190);
+
+    // Start dimming cycle before transform has settled.
+    test_controller.turnOnOff(false);
+
+    // Complete transform cycle.
+    test_controller_loop_n_times(10);
+
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
+
+    assertEqual(pixel->transformStepsRemaining, 0);
+    assertEqual(pixel->brightness, 180);
+    for (byte i = 0; i < 180; i++) {
+        test_controller.loop();
+        assertEqual(pixel->transformStepsRemaining, 0);
+    }
+
+    assertTrue(test_controller.ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT);
+}
 
 testF(Transform__twinkle_off, color_swap) {
     /* Pixel colors should change to their target color after the controller

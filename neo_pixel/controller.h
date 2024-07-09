@@ -42,7 +42,7 @@ void loop() {
     /* Main controller loop. Handles brightness twinkling, transforming RGB,
     turning on, turning off, and standing by. */
 
-    if (!on && ALL_PIXELS_BRIGHTNESS_ARE_CURRENT)
+    if (!on && ALL_PIXELS_BRIGHTNESS_ARE_CURRENT && ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT)
         // Controller OFF and dimmed. Do nothing.
         return;
 
@@ -104,6 +104,7 @@ void loop() {
     }
 
     // Twinkle / Transform
+    byte ACTIVE_TRANSFORM_CYCLES_REMAINING = numOfPixels;
     for (byte i = 0; i < numOfPixels; i++) {
         Pixel *pixel = &pixels[i];
 
@@ -111,12 +112,17 @@ void loop() {
         if (twinkle && on)
             pixel->twinkle(this->brightness, this->transform);
         // Transform RGB
-        if (transform || pixel->transformStepsRemaining)
-            pixel->transform(this->transform);
+        if ((transform && on) || pixel->transformStepsRemaining) {
+            pixel->transform(this->on, this->transform);
+            if (pixel->transformStepsRemaining == 0)
+                ACTIVE_TRANSFORM_CYCLES_REMAINING--;
+        }
 
         // Brightness or RGB changed. Apply them.
         this->applyPixelSettingsToNeoPixel(i, pixel);
     }
+    if (ACTIVE_TRANSFORM_CYCLES_REMAINING == 0)
+        ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = true;
 
     this->strip.show();
 }
@@ -166,7 +172,7 @@ void settleAnyTransforms() {
             ACTIVE_CYCLES_REMAINING--;
             continue;
         }
-        pixel->transform(this->transform);
+        pixel->transform(this->on, this->transform);
         this->applyPixelSettingsToNeoPixel(i, pixel);
     }
     if (ACTIVE_CYCLES_REMAINING == 0)

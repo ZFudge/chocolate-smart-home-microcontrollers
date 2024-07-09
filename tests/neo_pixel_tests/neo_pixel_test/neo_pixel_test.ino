@@ -102,6 +102,24 @@ testF(NeoPixelDefault, applyBrightness) {
     assertEqual(test_controller.applyBrightness(100, 85 ), 33);
 }
 
+testF(NeoPixelDefault, setMS) {
+    assertEqual(test_controller.ms, 0);
+    test_controller.setMS(10);
+    assertEqual(test_controller.ms, 10);
+    test_controller.setMS(255);
+    assertEqual(test_controller.ms, 255);
+    test_controller.setMS(127);
+    assertEqual(test_controller.ms, 127);
+    test_controller.setMS(4);
+    assertEqual(test_controller.ms, 4);
+    test_controller.setMS(1);
+    assertEqual(test_controller.ms, 1);
+    test_controller.setMS(0);
+    assertEqual(test_controller.ms, 0);
+    test_controller.setMS(7);
+    assertEqual(test_controller.ms, 7);
+}
+
 
 class NeoPixelOff: public aunit::TestOnce {
 protected:

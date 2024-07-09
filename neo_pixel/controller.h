@@ -21,6 +21,7 @@ bool ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
 bool twinkle = true;
 bool transform = true;
 byte brightness = 255;
+byte ms = 0;
 
 void init(const byte dataPin, const byte numOfPixels) {
     if (strip.numPixels()) return;
@@ -125,6 +126,8 @@ void loop() {
         ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = true;
 
     this->strip.show();
+
+    delay(this->ms);
 }
 
 void turnOnOff(const bool on) {
@@ -132,6 +135,9 @@ void turnOnOff(const bool on) {
         return;
     this->on = on;
     this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+};
+void setMS(const byte ms) {
+    this->ms = ms;
 };
 void setBrightness(const byte brightness) {
     if (brightness == this->brightness)

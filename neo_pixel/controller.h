@@ -3,6 +3,7 @@
 
 #include <Adafruit_NeoPixel.h>
 
+#include "consts.h"
 #include "pixel.h"
 
 namespace NeoPixel {
@@ -15,12 +16,15 @@ Pixel* pixels = NULL;
 
 byte numOfPixels;
 bool on = true;
-bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
+bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+bool ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
 bool twinkle = true;
 bool transform = true;
 byte brightness = 255;
 
 void init(const byte dataPin, const byte numOfPixels) {
+    if (strip.numPixels()) return;
+
     strip.setPin(dataPin);
     strip.updateLength(numOfPixels);
     strip.updateType(NEO_GRB + NEO_KHZ800);
@@ -38,7 +42,7 @@ void loop() {
     /* Main controller loop. Handles brightness twinkling, transforming RGB,
     turning on, turning off, and standing by. */
 
-    if (!on && ALL_PIXELS_BRIGHTNESS_ARE_CURRENT)
+    if (!on && ALL_PIXELS_BRIGHTNESS_ARE_CURRENT && ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT)
         // Controller OFF and dimmed. Do nothing.
         return;
 
@@ -56,16 +60,15 @@ void loop() {
                 bool DONE_CHANGING_BRIGHTNESS = true;
                 for (byte i = 0; i < numOfPixels; i++) {
                     Pixel *pixel = &pixels[i];
-                    if (pixel->brightness < this->brightness) {
+                    if (pixel->brightness < this->brightness)
                         pixel->brightness++;
-                    } else if (pixel->brightness > this->brightness) {
+                    else if (pixel->brightness > this->brightness)
                         pixel->brightness--;
-                    }
                     if (pixel->brightness != this->brightness)
                         DONE_CHANGING_BRIGHTNESS = false;
                     if (!this->transform)
                         // No twinkling or color transforms. Just apply brightness.
-                        this->applyBrightnessAndOrRGBtoNeoPixel(i, pixel);
+                        this->applyPixelSettingsToNeoPixel(i, pixel);
                 }
                 if (DONE_CHANGING_BRIGHTNESS)
                     this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
@@ -80,22 +83,28 @@ void loop() {
                 if (pixel->brightness)
                     DONE_TURNING_OFF = false;
                 if (!this->transform)
-                    // Transform false. Twinkling won't apply when controller is off. Just apply brightness. """
-                    this->applyBrightnessAndOrRGBtoNeoPixel(i, pixel);
+                    // Transform false. Twinkling won't apply when controller
+                    // is off. Just apply brightness.
+                    this->applyPixelSettingsToNeoPixel(i, pixel);
             }
             if (DONE_TURNING_OFF)
                 this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
         }
     }
 
-    if (!transform)
+    if (!transform) {
         /* Either the controller is on but twinkle and transform are both off
             OR
             controller is dimming and twinkling doesn't apply. */
-        if (!twinkle || (twinkle && !on))
+        if (!twinkle || (twinkle && !on)) {
+            if (!ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT)
+                settleAnyTransforms();
             return;
+        }
+    }
 
     // Twinkle / Transform
+    byte ACTIVE_TRANSFORM_CYCLES_REMAINING = numOfPixels;
     for (byte i = 0; i < numOfPixels; i++) {
         Pixel *pixel = &pixels[i];
 
@@ -103,12 +112,17 @@ void loop() {
         if (twinkle && on)
             pixel->twinkle(this->brightness, this->transform);
         // Transform RGB
-        if (transform)
-            pixel->transform();
+        if ((transform && on) || pixel->transformStepsRemaining) {
+            pixel->transform(this->on, this->transform);
+            if (pixel->transformStepsRemaining == 0)
+                ACTIVE_TRANSFORM_CYCLES_REMAINING--;
+        }
 
         // Brightness or RGB changed. Apply them.
-        this->applyBrightnessAndOrRGBtoNeoPixel(i, pixel);
+        this->applyPixelSettingsToNeoPixel(i, pixel);
     }
+    if (ACTIVE_TRANSFORM_CYCLES_REMAINING == 0)
+        ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = true;
 
     this->strip.show();
 }
@@ -122,33 +136,101 @@ void turnOnOff(const bool on) {
 void setBrightness(const byte brightness) {
     if (brightness == this->brightness)
         return;
+    // If brightness setting would be dark enough to appear as though the
+    // controller is turned off, just turn it off instead.
+    if (brightness <= MIN_TWINKLE_BRIGHTNESS_THRESHOLD) {
+        this->turnOnOff(false);
+        return;
+    }
     this->brightness = brightness;
     this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 };
 void setTwinkle(const bool twinkle) {
     this->twinkle = twinkle;
+
+    if (twinkle) return;
+    // Trigger brightness of pixels settling at controller brightness setting.
+    for (byte i = 0; i < numOfPixels; i++) {
+        if (pixels[i].brightness != this->brightness) {
+            ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+            break;
+        }
+    }
 };
 void setTransform(const bool transform) {
     this->transform = transform;
+    if (this->transform)
+        ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
 };
+void settleAnyTransforms() {
+    /* Increments any transform cycles towards completion, after transform has
+    been turned off. */
+    byte ACTIVE_CYCLES_REMAINING = numOfPixels;
+    for (byte i = 0; i < numOfPixels; i++) {
+        Pixel *pixel = &pixels[i];
+        if (!pixel->transformStepsRemaining) {
+            ACTIVE_CYCLES_REMAINING--;
+            continue;
+        }
+        pixel->transform(this->on, this->transform);
+        this->applyPixelSettingsToNeoPixel(i, pixel);
+    }
+    if (ACTIVE_CYCLES_REMAINING == 0)
+        ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = true;
+}
 
-byte applyBrightness(const float colorComponent, const float pixelBrightness) {
-    float result = colorComponent;
-    result *= (float)this->brightness / 255.0;
-    result *= pixelBrightness / 255.0;
+const byte applyBrightness(const float colorComponent, const double pixelBrightness) {
+    /* Apply controller brightness and pixel brightness to color components. */
+    double result = colorComponent;
+    // Apply controller brightness.
+    result *= (double)this->brightness / (double)255.0;
+    // Apply pixel brightness.
+    result *= pixelBrightness / (double)255.0;
     return round(result);
 }
 
-void applyBrightnessAndOrRGBtoNeoPixel(const byte index, const Pixel *pixel) {
-    this->strip.setPixelColor(
-        index,
-        strip.Color(
-            applyBrightness(pixel->r, pixel->brightness),
-            applyBrightness(pixel->g, pixel->brightness),
-            applyBrightness(pixel->b, pixel->brightness)
-        )
+void applyPixelSettingsToNeoPixel(const byte pixelIndex, const Pixel *pixel) {
+    /* Apply pixel settings to corresponding NeoPixel. */
+    const uint32_t pixelColor = strip.Color(
+        applyBrightness(pixel->r, pixel->brightness),
+        applyBrightness(pixel->g, pixel->brightness),
+        applyBrightness(pixel->b, pixel->brightness)
     );
+    this->strip.setPixelColor(pixelIndex, pixelColor);
 };
+
+void updateRGBs(String csvPalette) {
+    /* Change color palette and set new target colors to the corresponding the
+    color of the same color index used by each pixel when transform is on. */
+    // Update palette.
+    for (byte i = 0; i < PIXELS_LENGTH; i++) {
+        const byte colorComponent = csvPalette.substring(
+            0,
+            csvPalette.indexOf(',')
+        ).toInt();
+        csvPalette = csvPalette.substring(
+            csvPalette.indexOf(',') + 1,
+            csvPalette.length()
+        );
+        rgbs[i / 3][i % 3] = colorComponent;
+    }
+    // Update any transform color targets.
+    for (byte i = 0; i < numOfPixels; i++) {
+        Pixel *pixel = &pixels[i];
+        if (this->on) {
+            if (this->transform || pixel->transformStepsRemaining) {
+                pixel->setNewTransformTargetFromCurrentState();
+            } else if (!this->transform && !this->twinkle) {
+                // Force smooth transition when controller is on but no
+                // graceful way to
+                pixel->transformStepsRemaining = 200;
+                pixel->setNewTransformTargetFromCurrentState();
+            }
+        } else {
+            pixel->setRGBFromIndex();
+        }
+    }
+}
 
 };
 

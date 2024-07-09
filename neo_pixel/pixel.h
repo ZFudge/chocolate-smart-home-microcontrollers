@@ -5,6 +5,9 @@
 #include "utils.h"
 
 
+const byte MIN_TWINKLE_BRIGHTNESS_THRESHOLD = 5;
+
+
 struct Pixel : public Utils::PixelUtils {
 
 float r, g, b;
@@ -17,7 +20,6 @@ byte targetBrightness;
 byte transformStepsRemaining;
 double rTransformStep, gTransformStep, bTransformStep;
 
-const byte MIN_TWINKLE_BRIGHTNESS_THRESHOLD = 5;
 
 Pixel() {
     setColorRandomAny();
@@ -30,6 +32,8 @@ void setRGBFromIndex() {
 }
 
 void setColorIndex(const byte index) {
+    if (index > NUM_COLORS - 1)
+        return;
     this->colorIndex = index;
 }
 void setColorRandom() {
@@ -69,17 +73,24 @@ void setTransformStepsRemainingRandom() {
     this->transformStepsRemaining = getTransformStepsRemainingRandom();
 }
 void setNewTransform() {
+    /* Start new transform cycle, within the same color palette */
     this->setTransformStepsRemainingRandom();
-    const byte r1 = this->r;
-    const byte g1 = this->g;
-    const byte b1 = this->b;
+    // Re-anchor color components to palette to prevent floating point errors
+    // from causing colors to drift.
+    this->setRGBFromIndex();
+    this->setNewTransformTargetFromCurrentState();
+}
+void setNewTransformTargetFromCurrentState() {
+    const double r1 = this->r;
+    const double g1 = this->g;
+    const double b1 = this->b;
     this->setColorRandom();
-    const byte r2 = this->r;
-    const byte g2 = this->g;
-    const byte b2 = this->b;
-    const double rDiff = (double)r2 - r1;
-    const double gDiff = (double)g2 - g1;
-    const double bDiff = (double)b2 - b1;
+    const double r2 = this->r;
+    const double g2 = this->g;
+    const double b2 = this->b;
+    const double rDiff = r2 - r1;
+    const double gDiff = g2 - g1;
+    const double bDiff = b2 - b1;
 
     this->rTransformStep = rDiff / (double)transformStepsRemaining;
     this->gTransformStep = gDiff / (double)transformStepsRemaining;
@@ -88,14 +99,22 @@ void setNewTransform() {
     this->g = g1;
     this->b = b1;
 }
- 
-void transform() {
-    if (transformStepsRemaining <= 0)
+
+void transform(const bool controllerOn, const bool controllerTransform) {
+    if (transformStepsRemaining <= 0 && controllerOn)
         setNewTransform();
+
     this->r += rTransformStep;
     this->g += gTransformStep;
     this->b += bTransformStep;
     this->transformStepsRemaining--;
+
+    // Unset steps when transform is off and transform cycle has finished.
+    if ((!controllerOn || !controllerTransform) && transformStepsRemaining == 0) {
+        this->rTransformStep = 0.0;
+        this->gTransformStep = 0.0;
+        this->bTransformStep = 0.0;
+    }
 }
 
 

@@ -14,6 +14,21 @@ byte getRandomIndex(const byte oldIndex) {
     return i;
 }
 
+bool hasParam(const String param, const String msg) {
+    return msg.indexOf(param + (String)"=") != -1;
+}
+
+byte getByteValueUsingKey(String msg, String key) {
+    const String keyStart = key + (String)"=";
+    // Trim up to the param value.
+    msg = msg.substring(
+        msg.indexOf(keyStart) + keyStart.length(),
+        msg.length()
+    );
+    const byte value = msg.substring(0, msg.indexOf(";")).toInt();
+    return value;
+}
+
 
 byte getColorRandomAnyDefault() {
     return getRandomIndex(NUM_COLORS + 1);

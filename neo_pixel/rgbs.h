@@ -1,7 +1,10 @@
 #ifndef RGBS_H
 #define RGBS_H
 
+
 const byte NUM_COLORS = 9;
+const byte PIXELS_LENGTH = 27;
+
 
 // Default "Outrun" palette
 byte rgbs[NUM_COLORS][3] = {
@@ -15,5 +18,16 @@ byte rgbs[NUM_COLORS][3] = {
     { 222, 25, 255 },   // pink 2
     { 252, 3, 165 },    // ruby
 };
+
+String getCsvRGBs() {
+    String csvRGBs;
+    for (byte i = 0; i < PIXELS_LENGTH; i++) {
+        csvRGBs += rgbs[i / 3][i % 3];
+        if (i < PIXELS_LENGTH - 1)
+            csvRGBs += ",";
+    }
+    return csvRGBs;
+}
+
 
 #endif

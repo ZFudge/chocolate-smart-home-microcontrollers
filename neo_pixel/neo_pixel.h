@@ -2,5 +2,6 @@
 #define NEO_PIXEL_H
 
 #include "controller.h"
+#include "duplex_messenger.h"
 
 #endif

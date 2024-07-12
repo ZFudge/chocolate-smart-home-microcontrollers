@@ -6,6 +6,7 @@
 #include "consts.h"
 #include "pixel.h"
 
+
 namespace NeoPixel {
 
 

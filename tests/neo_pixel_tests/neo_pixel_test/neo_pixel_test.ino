@@ -52,6 +52,24 @@ test(idempotent_init) {
 }
 
 
+test(updateType_init) {
+    NeoPixelController test_controller;
+    test_controller.updateType(NEO_GRB + NEO_KHZ800);
+    test_controller.init(6, 50);
+    for (int i = 0; i < 1000; i++)
+        test_controller.loop();
+}
+
+
+test(init_updateType) {
+    NeoPixelController test_controller;
+    test_controller.init(6, 50);
+    test_controller.updateType(NEO_GRB + NEO_KHZ800);
+    for (int i = 0; i < 1000; i++)
+        test_controller.loop();
+}
+
+
 class NeoPixelDefault: public aunit::TestOnce {
 protected:
     NeoPixelController test_controller;

@@ -12,19 +12,6 @@ using namespace NeoPixel;
 #define TEST_NUM_PIX    10
 
 
-// test(two_controllers) {
-//     NeoPixelController test_controller_0;
-//     test_controller_0.init(6, 2);
-//     assertEqual(6, test_controller_0.strip.getPin());
-//     assertEqual(2, test_controller_0.strip.numPixels());
-
-//     NeoPixelController test_controller_1;
-//     test_controller_1.init(7, 3);
-//     assertEqual(7, test_controller_1.strip.getPin());
-//     assertEqual(3, test_controller_1.strip.numPixels());
-// }
-
-
 class ControllerProcessMsg: public aunit::TestOnce {
 protected:
     NeoPixelController test_controller;
@@ -34,6 +21,7 @@ protected:
     }
 };
 
+// getByteValueUsingKey start
 testF(ControllerProcessMsg, getByteValueUsingKey_on_true) {
     const String incomingMessage = "on=1;";
     assertTrue((bool)Utils::getByteValueUsingKey(incomingMessage, "on"));
@@ -77,7 +65,9 @@ testF(ControllerProcessMsg, getByteValueUsingKey_transform_false) {
     const String incomingMessage = "transform=0;";
     assertFalse((bool)Utils::getByteValueUsingKey(incomingMessage, "transform"));
 }
+// getByteValueUsingKey end
 
+// processNeoPixelMsg start
 testF(ControllerProcessMsg, processNeoPixelMsg_on) {
     const String incomingMessage = "on=1;";
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
@@ -128,6 +118,7 @@ testF(ControllerProcessMsg, processNeoPixelMsg_transform_false) {
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertFalse(test_controller.transform);
 }
+// processNeoPixelMsg end
 
 
 class ControllerRGBs: public aunit::TestOnce {

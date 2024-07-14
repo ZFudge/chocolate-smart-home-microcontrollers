@@ -24,12 +24,16 @@ bool transform = true;
 byte brightness = 255;
 byte ms = 0;
 
+
+void updateType(neoPixelType npType) {
+    strip.updateType(npType);
+}
+
 void init(const byte dataPin, const byte numOfPixels) {
     if (strip.numPixels()) return;
 
     strip.setPin(dataPin);
     strip.updateLength(numOfPixels);
-    strip.updateType(NEO_GRB + NEO_KHZ800);
     strip.begin();
     strip.show();
 

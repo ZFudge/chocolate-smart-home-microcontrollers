@@ -462,7 +462,7 @@ testF(Simultaneous, interactions) {
     assertEqual(p_3->targetBrightness, 20);
 
     ///////////////////////////////////////////////////////////////////////////
-    /* Test dimming cycle when twinkle and transform are both on. */ 
+    /* Test dimming cycle when twinkle and transform are both on. */
     test_controller.turnOnOff(false);
     assertFalse(test_controller.on);
     assertTrue(test_controller.twinkle);

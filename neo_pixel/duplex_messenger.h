@@ -45,7 +45,7 @@ void processNeoPixelMsg(String message, NeoPixel::NeoPixelController *controller
         controller->setTransform(transform);
     }
 
-    if (Utils::hasParam("pallette", message)) {
+    if (Utils::hasParam("palette", message)) {
         const String keyStart = "palette=";
         // Trim up to the param key.
         const String msg = message.substring(

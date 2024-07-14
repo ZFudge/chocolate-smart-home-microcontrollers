@@ -118,6 +118,93 @@ testF(ControllerProcessMsg, processNeoPixelMsg_transform_false) {
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertFalse(test_controller.transform);
 }
+
+testF(ControllerProcessMsg, processNeoPixelMsg_palette) {
+    const String incomingMessage =
+        "palette=0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,255;";
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertEqual(rgbs[0][0], 0);
+    assertEqual(rgbs[0][1], 10);
+    assertEqual(rgbs[0][2], 20);
+    assertEqual(rgbs[1][0], 30);
+    assertEqual(rgbs[1][1], 40);
+    assertEqual(rgbs[1][2], 50);
+    assertEqual(rgbs[2][0], 60);
+    assertEqual(rgbs[2][1], 70);
+    assertEqual(rgbs[2][2], 80);
+    assertEqual(rgbs[3][0], 90);
+    assertEqual(rgbs[3][1], 100);
+    assertEqual(rgbs[3][2], 110);
+    assertEqual(rgbs[4][0], 120);
+    assertEqual(rgbs[4][1], 130);
+    assertEqual(rgbs[4][2], 140);
+    assertEqual(rgbs[5][0], 150);
+    assertEqual(rgbs[5][1], 160);
+    assertEqual(rgbs[5][2], 170);
+    assertEqual(rgbs[6][0], 180);
+    assertEqual(rgbs[6][1], 190);
+    assertEqual(rgbs[6][2], 200);
+    assertEqual(rgbs[7][0], 210);
+    assertEqual(rgbs[7][1], 220);
+    assertEqual(rgbs[7][2], 230);
+    assertEqual(rgbs[8][0], 240);
+    assertEqual(rgbs[8][1], 250);
+    assertEqual(rgbs[8][2], 255);
+
+}
+
+
+testF(ControllerProcessMsg, processNeoPixelMsg_all) {
+    const String incomingMessage =
+        (String)"on=0;" +
+        (String)"brightness=234;" +
+        (String)"ms=7;" +
+        (String)"twinkle=0;" +
+        (String)"transform=0;" +
+        (String)"palette=0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,255;";
+
+    assertTrue(test_controller.on);
+    assertEqual(test_controller.brightness, 255);
+    assertEqual(test_controller.ms, 0);
+    assertTrue(test_controller.twinkle);
+    assertTrue(test_controller.transform);
+
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+
+    assertFalse(test_controller.on);
+    assertEqual(test_controller.brightness, 234);
+    assertEqual(test_controller.ms, 7);
+    assertFalse(test_controller.twinkle);
+    assertFalse(test_controller.transform);
+    assertEqual(rgbs[0][0], 0);
+    assertEqual(rgbs[0][1], 10);
+    assertEqual(rgbs[0][2], 20);
+    assertEqual(rgbs[1][0], 30);
+    assertEqual(rgbs[1][1], 40);
+    assertEqual(rgbs[1][2], 50);
+    assertEqual(rgbs[2][0], 60);
+    assertEqual(rgbs[2][1], 70);
+    assertEqual(rgbs[2][2], 80);
+    assertEqual(rgbs[3][0], 90);
+    assertEqual(rgbs[3][1], 100);
+    assertEqual(rgbs[3][2], 110);
+    assertEqual(rgbs[4][0], 120);
+    assertEqual(rgbs[4][1], 130);
+    assertEqual(rgbs[4][2], 140);
+    assertEqual(rgbs[5][0], 150);
+    assertEqual(rgbs[5][1], 160);
+    assertEqual(rgbs[5][2], 170);
+    assertEqual(rgbs[6][0], 180);
+    assertEqual(rgbs[6][1], 190);
+    assertEqual(rgbs[6][2], 200);
+    assertEqual(rgbs[7][0], 210);
+    assertEqual(rgbs[7][1], 220);
+    assertEqual(rgbs[7][2], 230);
+    assertEqual(rgbs[8][0], 240);
+    assertEqual(rgbs[8][1], 250);
+    assertEqual(rgbs[8][2], 255);
+
+}
 // processNeoPixelMsg end
 
 

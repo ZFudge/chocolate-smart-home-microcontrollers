@@ -15,7 +15,7 @@ struct NeoPixelController : public Adafruit_NeoPixel {
 Adafruit_NeoPixel strip = Adafruit_NeoPixel();
 Pixel* pixels = NULL;
 
-byte numOfPixels;
+byte numOfPixels = 0;
 bool on = true;
 bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 bool ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
@@ -25,13 +25,10 @@ byte brightness = 255;
 byte ms = 0;
 
 
-void updateType(neoPixelType npType) {
+void init(const byte dataPin, const byte numOfPixels, neoPixelType npType = NEO_GRB + NEO_KHZ800) {
+    if (strip.numPixels() || numOfPixels == 0) return;
+
     strip.updateType(npType);
-}
-
-void init(const byte dataPin, const byte numOfPixels) {
-    if (strip.numPixels()) return;
-
     strip.setPin(dataPin);
     strip.updateLength(numOfPixels);
     strip.begin();

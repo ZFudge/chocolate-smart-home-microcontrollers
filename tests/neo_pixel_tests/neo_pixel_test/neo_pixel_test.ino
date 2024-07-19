@@ -52,21 +52,24 @@ test(idempotent_init) {
 }
 
 
-test(updateType_init) {
+test(init_updateType) {
     NeoPixelController test_controller;
-    test_controller.updateType(NEO_GRB + NEO_KHZ800);
-    test_controller.init(6, 50);
+    test_controller.init(6, 50, NEO_GRB + NEO_KHZ800);
     for (int i = 0; i < 1000; i++)
         test_controller.loop();
 }
 
 
-test(init_updateType) {
+test(init_zero_numOfPixels) {
+    /* Passing controller.init a numOfPixels value of 0 should trigger a guard
+    clause that aborts the controller.init from initializing the controller */
     NeoPixelController test_controller;
-    test_controller.init(6, 50);
-    test_controller.updateType(NEO_GRB + NEO_KHZ800);
-    for (int i = 0; i < 1000; i++)
-        test_controller.loop();
+    test_controller.init(6, 0);
+    assertEqual(0, test_controller.numOfPixels);
+    assertEqual(0, test_controller.strip.numPixels());
+    assertEqual(-1, test_controller.strip.getPin());
+    assertEqual(NULL, test_controller.pixels);
+    assertEqual(0, test_controller.numOfPixels);
 }
 
 

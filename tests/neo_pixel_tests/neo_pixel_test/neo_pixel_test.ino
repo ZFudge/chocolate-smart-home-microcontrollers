@@ -73,7 +73,6 @@ test(init_zero_numOfPixels) {
     assertEqual(0, test_controller.strip.numPixels());
     assertEqual(-1, test_controller.strip.getPin());
     assertEqual(NULL, test_controller.pixels);
-    assertEqual(0, test_controller.numOfPixels);
 }
 
 
@@ -261,16 +260,16 @@ testF(NeoPixelMaxCount, setMaxCount) {
     assertEqual(2, test_controller.maxCount);
 }
 
-testF(NeoPixelMaxCount, actualNumOfPixelObjects) {
-    /* actualNumOfPixelObjects should not modify maxCount if controller is already initialized */
-    assertEqual(test_controller.actualNumOfPixelObjects, test_controller.maxCount);
+testF(NeoPixelMaxCount, numOfPixels) {
+    assertEqual(2, test_controller.numOfPixels);
 }
 
-testF(NeoPixelMaxCount, numOfPixels) {
-    assertEqual(4, test_controller.numOfPixels);
+testF(NeoPixelMaxCount, strip_numOfPixels) {
+    assertEqual(4, test_controller.strip.numPixels());
 }
 
 test(setMaxCount_zero) {
+    /* controller.setMaxCount should not set controller.maxCount to 0 */
     NeoPixelController test_controller;
     test_controller.setMaxCount(0);
     assertEqual(test_controller.maxCount, 50);

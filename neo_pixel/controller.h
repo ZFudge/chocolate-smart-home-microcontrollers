@@ -16,6 +16,8 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel();
 Pixel* pixels = NULL;
 
 byte numOfPixels = 0;
+// Maximum number of pixel objects allowed.
+byte maxCount = 50;
 bool on = true;
 bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 bool ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
@@ -23,9 +25,6 @@ bool twinkle = true;
 bool transform = true;
 byte brightness = 255;
 byte ms = 0;
-// Maximum number of pixel objects allowed.
-byte maxCount = 50;
-byte actualNumOfPixelObjects = 0;
 
 void init(const byte dataPin, const byte numOfPixels, neoPixelType npType = NEO_GRB + NEO_KHZ800) {
     if (strip.numPixels() || numOfPixels == 0)
@@ -35,9 +34,9 @@ void init(const byte dataPin, const byte numOfPixels, neoPixelType npType = NEO_
     // the two values will be used for initializing the number of pixel objects,
     // with each pixel object representing neo pixels numbered as:
     //      n, n+maxCount, n+maxCount*2, ...
-    // with the pattern ending when n+maxCount*index exceeds actualNumOfPixelObjects
-    this->numOfPixels = numOfPixels;
-    this->actualNumOfPixelObjects = min(numOfPixels, maxCount);
+    // with the pattern ending when n+maxCount*index exceeds numOfPixels
+    // this->numOfPixels = numOfPixels;
+    this->numOfPixels = min(numOfPixels, maxCount);
 
     strip.updateType(npType);
     strip.setPin(dataPin);
@@ -45,9 +44,9 @@ void init(const byte dataPin, const byte numOfPixels, neoPixelType npType = NEO_
     strip.begin();
     strip.show();
 
-    pixels = new Pixel[actualNumOfPixelObjects];
+    pixels = new Pixel[numOfPixels];
     if (transform)
-        for (byte i = 0; i < actualNumOfPixelObjects; i++)
+        for (byte i = 0; i < numOfPixels; i++)
             pixels[i].setNewTransform();
 }
 
@@ -71,7 +70,7 @@ void loop() {
             } else {
                 // Manually turn on.
                 bool DONE_CHANGING_BRIGHTNESS = true;
-                for (byte i = 0; i < actualNumOfPixelObjects; i++) {
+                for (byte i = 0; i < numOfPixels; i++) {
                     Pixel *pixel = &pixels[i];
                     if (pixel->brightness < this->brightness)
                         pixel->brightness++;
@@ -89,7 +88,7 @@ void loop() {
         } else {
             /* Dim from ON to OFF */
             bool DONE_TURNING_OFF = true;
-            for (byte i = 0; i < actualNumOfPixelObjects; i++) {
+            for (byte i = 0; i < numOfPixels; i++) {
                 Pixel *pixel = &pixels[i];
                 if (pixel->brightness)
                     pixel->brightness--;
@@ -117,8 +116,8 @@ void loop() {
     }
 
     // Twinkle / Transform
-    byte ACTIVE_TRANSFORM_CYCLES_REMAINING = actualNumOfPixelObjects;
-    for (byte i = 0; i < actualNumOfPixelObjects; i++) {
+    byte ACTIVE_TRANSFORM_CYCLES_REMAINING = numOfPixels;
+    for (byte i = 0; i < this->numOfPixels; i++) {
         Pixel *pixel = &pixels[i];
 
         // Twinkle brightness
@@ -152,7 +151,7 @@ void setMS(const byte ms) {
     this->ms = ms;
 };
 void setMaxCount(const byte maxCount) {
-    if (maxCount == 0 || this->actualNumOfPixelObjects > 0) return;
+    if (maxCount == 0 || this->numOfPixels > 0) return;
     this->maxCount = maxCount;
 };
 void setBrightness(const byte brightness) {
@@ -172,7 +171,7 @@ void setTwinkle(const bool twinkle) {
 
     if (twinkle) return;
     // Trigger brightness of pixels settling at controller brightness setting.
-    for (byte i = 0; i < actualNumOfPixelObjects; i++) {
+    for (byte i = 0; i < numOfPixels; i++) {
         if (pixels[i].brightness != this->brightness) {
             ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
             break;
@@ -187,8 +186,8 @@ void setTransform(const bool transform) {
 void settleAnyTransforms() {
     /* Increments any transform cycles towards completion, after transform has
     been turned off. */
-    byte ACTIVE_CYCLES_REMAINING = actualNumOfPixelObjects;
-    for (byte i = 0; i < actualNumOfPixelObjects; i++) {
+    byte ACTIVE_CYCLES_REMAINING = numOfPixels;
+    for (byte i = 0; i < numOfPixels; i++) {
         Pixel *pixel = &pixels[i];
         if (!pixel->transformStepsRemaining) {
             ACTIVE_CYCLES_REMAINING--;
@@ -221,7 +220,7 @@ void applyPixelSettingsToNeoPixel(const byte pixelIndex, const Pixel *pixel) {
 
     // Apply pixel object color to the neo pixel of the corresponding index, as
     // well as any duplicate neo pixels that reuse the same pixel object.
-    for (int i = pixelIndex; i < (int)numOfPixels; i += this->maxCount)
+    for (int i = pixelIndex; i < this->strip.numPixels(); i += this->maxCount)
         this->strip.setPixelColor((byte)i, pixelColor);
 };
 
@@ -241,7 +240,7 @@ void updateRGBs(String csvPalette) {
         rgbs[i / 3][i % 3] = colorComponent;
     }
     // Update any transform color targets.
-    for (byte i = 0; i < actualNumOfPixelObjects; i++) {
+    for (byte i = 0; i < numOfPixels; i++) {
         Pixel *pixel = &pixels[i];
         if (this->on) {
             if (this->transform || pixel->transformStepsRemaining) {

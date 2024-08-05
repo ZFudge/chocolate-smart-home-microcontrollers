@@ -42,8 +42,7 @@ protected:
 
 testF(NeoPixelStripMaxCount, numbers) {
     assertEqual(5, test_controller.maxCount);
-    assertEqual(5, test_controller.actualNumOfPixelObjects);
-    assertEqual(10, test_controller.numOfPixels);
+    assertEqual(5, test_controller.numOfPixels);
     assertEqual(10, test_controller.strip.numPixels());
 }
 
@@ -72,8 +71,7 @@ protected:
 
 testF(NeoPixelStripMaxCountUneven, numbers) {
     assertEqual(7, test_controller.maxCount);
-    assertEqual(7, test_controller.actualNumOfPixelObjects);
-    assertEqual(10, test_controller.numOfPixels);
+    assertEqual(7, test_controller.numOfPixels);
     assertEqual(10, test_controller.strip.numPixels());
 }
 

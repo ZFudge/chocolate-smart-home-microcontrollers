@@ -16,6 +16,8 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel();
 Pixel* pixels = NULL;
 
 byte numOfPixels = 0;
+// Maximum number of pixel objects allowed.
+byte maxCount = 50;
 bool on = true;
 bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 bool ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
@@ -24,9 +26,17 @@ bool transform = true;
 byte brightness = 255;
 byte ms = 0;
 
-
 void init(const byte dataPin, const byte numOfPixels, neoPixelType npType = NEO_GRB + NEO_KHZ800) {
-    if (strip.numPixels() || numOfPixels == 0) return;
+    if (strip.numPixels() || numOfPixels == 0)
+        return;
+
+    // If the number of pixels is greater than the max count, the smaller of
+    // the two values will be used for initializing the number of pixel objects,
+    // with each pixel object representing neo pixels numbered as:
+    //      n, n+maxCount, n+maxCount*2, ...
+    // with the pattern ending when n+maxCount*index exceeds numOfPixels
+    // this->numOfPixels = numOfPixels;
+    this->numOfPixels = min(numOfPixels, maxCount);
 
     strip.updateType(npType);
     strip.setPin(dataPin);
@@ -34,7 +44,6 @@ void init(const byte dataPin, const byte numOfPixels, neoPixelType npType = NEO_
     strip.begin();
     strip.show();
 
-    this->numOfPixels = numOfPixels;
     pixels = new Pixel[numOfPixels];
     if (transform)
         for (byte i = 0; i < numOfPixels; i++)
@@ -108,7 +117,7 @@ void loop() {
 
     // Twinkle / Transform
     byte ACTIVE_TRANSFORM_CYCLES_REMAINING = numOfPixels;
-    for (byte i = 0; i < numOfPixels; i++) {
+    for (byte i = 0; i < this->numOfPixels; i++) {
         Pixel *pixel = &pixels[i];
 
         // Twinkle brightness
@@ -140,6 +149,10 @@ void turnOnOff(const bool on) {
 };
 void setMS(const byte ms) {
     this->ms = ms;
+};
+void setMaxCount(const byte maxCount) {
+    if (maxCount == 0 || this->numOfPixels > 0) return;
+    this->maxCount = maxCount;
 };
 void setBrightness(const byte brightness) {
     if (brightness == this->brightness)
@@ -204,7 +217,11 @@ void applyPixelSettingsToNeoPixel(const byte pixelIndex, const Pixel *pixel) {
         applyBrightness(pixel->g, pixel->brightness),
         applyBrightness(pixel->b, pixel->brightness)
     );
-    this->strip.setPixelColor(pixelIndex, pixelColor);
+
+    // Apply pixel object color to the neo pixel of the corresponding index, as
+    // well as any duplicate neo pixels that reuse the same pixel object.
+    for (int i = pixelIndex; i < this->strip.numPixels(); i += this->maxCount)
+        this->strip.setPixelColor((byte)i, pixelColor);
 };
 
 void updateRGBs(String csvPalette) {

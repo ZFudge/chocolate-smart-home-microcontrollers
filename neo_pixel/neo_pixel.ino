@@ -34,9 +34,11 @@ void setup() {
     np_controller.init(DATA_PIN, NUM_PIX, NEO_RGB + NEO_KHZ800);
     np_controller.setMS(5);
 
+    // Use controller-specific methods for instructing controller state.
     CsmEspConn::controller.setGetState(getControllerState);
     CsmEspConn::controller.setProcessMsgReceived(processMsg);
 
+    // Configure controller.
     CsmEspConn::controller.setMQTTId(MQTT_ID);
     CsmEspConn::controller.setType(CONTROLLER_TYPE);
     CsmEspConn::controller.init(NAME);

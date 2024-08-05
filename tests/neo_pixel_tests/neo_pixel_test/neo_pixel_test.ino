@@ -12,6 +12,10 @@ using namespace NeoPixel;
 #define TEST_NUM_PIX    10
 
 
+test(neo_pixel_getRandomIndex) {
+    assertNotEqual(Utils::getRandomIndex(1), 1);
+}
+
 test(two_controllers) {
     NeoPixelController test_controller_0;
     test_controller_0.init(6, 2);
@@ -69,7 +73,6 @@ test(init_zero_numOfPixels) {
     assertEqual(0, test_controller.strip.numPixels());
     assertEqual(-1, test_controller.strip.getPin());
     assertEqual(NULL, test_controller.pixels);
-    assertEqual(0, test_controller.numOfPixels);
 }
 
 
@@ -159,10 +162,6 @@ testF(NeoPixelOff, turn_on) {
     assertTrue(test_controller.on);
 }
 
-test(neo_pixel_getRandomIndex) {
-    assertNotEqual(Utils::getRandomIndex(1), 1);
-}
-
 
 class RGBs: public aunit::TestOnce {
 protected:
@@ -242,6 +241,48 @@ testF(RGBs, test_controller_updateRGBs) {
     assertEqual(rgbs[8][0], 25);
     assertEqual(rgbs[8][1], 26);
     assertEqual(rgbs[8][2], 27);
+}
+
+
+class NeoPixelMaxCount: public aunit::TestOnce {
+protected:
+    NeoPixelController test_controller;
+    void setup() override {
+        aunit::TestOnce::setup();
+        test_controller.setMaxCount(2);
+        test_controller.init(TEST_DATA_PIN, 4);
+    }
+};
+
+testF(NeoPixelMaxCount, setMaxCount) {
+    /* setMaxCount should not modify maxCount if controller is already initialized */
+    test_controller.setMaxCount(7);
+    assertEqual(2, test_controller.maxCount);
+}
+
+testF(NeoPixelMaxCount, numOfPixels) {
+    assertEqual(2, test_controller.numOfPixels);
+}
+
+testF(NeoPixelMaxCount, strip_numOfPixels) {
+    assertEqual(4, test_controller.strip.numPixels());
+}
+
+test(setMaxCount_zero) {
+    /* controller.setMaxCount should not set controller.maxCount to 0 */
+    NeoPixelController test_controller;
+    test_controller.setMaxCount(0);
+    assertEqual(test_controller.maxCount, 50);
+}
+
+test(setMaxCount) {
+    NeoPixelController test_controller;
+    test_controller.setMaxCount(14);
+    assertEqual(test_controller.maxCount, 14);
+    test_controller.setMaxCount(99);
+    assertEqual(test_controller.maxCount, 99);
+    test_controller.setMaxCount(255);
+    assertEqual(test_controller.maxCount, 255);
 }
 
 

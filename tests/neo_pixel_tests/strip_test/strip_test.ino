@@ -30,6 +30,66 @@ testF(NeoPixelStripDefault, numPixels) {
 }
 
 
+class NeoPixelStripMaxCount: public aunit::TestOnce {
+protected:
+    NeoPixelController test_controller;
+    void setup() override {
+        aunit::TestOnce::setup();
+        test_controller.setMaxCount(5);
+        test_controller.init(TEST_DATA_PIN, 10);
+    }
+};
+
+testF(NeoPixelStripMaxCount, numbers) {
+    assertEqual(5, test_controller.maxCount);
+    assertEqual(5, test_controller.actualNumOfPixelObjects);
+    assertEqual(10, test_controller.numOfPixels);
+    assertEqual(10, test_controller.strip.numPixels());
+}
+
+testF(NeoPixelStripMaxCount, pixel_values) {
+    for (byte j = 0; j < 100; j++) {
+        test_controller.loop();
+        for (byte i = 0; i < 5; i++) {
+            assertEqual(
+                test_controller.strip.getPixelColor(i),
+                test_controller.strip.getPixelColor(i + 5)
+            );
+        }
+    }
+}
+
+
+class NeoPixelStripMaxCountUneven: public aunit::TestOnce {
+protected:
+    NeoPixelController test_controller;
+    void setup() override {
+        aunit::TestOnce::setup();
+        test_controller.setMaxCount(7);
+        test_controller.init(TEST_DATA_PIN, 10);
+    }
+};
+
+testF(NeoPixelStripMaxCountUneven, numbers) {
+    assertEqual(7, test_controller.maxCount);
+    assertEqual(7, test_controller.actualNumOfPixelObjects);
+    assertEqual(10, test_controller.numOfPixels);
+    assertEqual(10, test_controller.strip.numPixels());
+}
+
+testF(NeoPixelStripMaxCountUneven, pixel_values) {
+    for (byte j = 0; j < 100; j++) {
+        test_controller.loop();
+        for (byte i = 0; i < 3; i++) {
+            assertEqual(
+                test_controller.strip.getPixelColor(i),
+                test_controller.strip.getPixelColor(i + 7)
+            );
+        }
+    }
+}
+
+
 class NeoPixelStripRGBs: public aunit::TestOnce {
 protected:
     NeoPixelController test_controller;

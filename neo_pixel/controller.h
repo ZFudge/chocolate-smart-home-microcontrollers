@@ -5,6 +5,7 @@
 
 #include "consts.h"
 #include "pixel.h"
+#include "pir.h"
 
 
 namespace NeoPixel {
@@ -25,6 +26,12 @@ bool twinkle = true;
 bool transform = true;
 byte brightness = 255;
 byte ms = 0;
+
+PIRSensor* pir = NULL;
+void enable_pir(const byte pirPin) {
+    if (strip.numPixels() > 0) return;
+    pir = new PIRSensor(pirPin);
+}
 
 void init(const byte dataPin, const byte numOfPixels, neoPixelType npType = NEO_GRB + NEO_KHZ800) {
     if (strip.numPixels() || numOfPixels == 0)

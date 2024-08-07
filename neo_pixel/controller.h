@@ -20,6 +20,9 @@ byte numOfPixels = 0;
 // Maximum number of pixel objects allowed.
 byte maxCount = 50;
 bool on = true;
+bool isOn() {
+    return on || (this->pir && pir->motionDetected());
+};
 bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 bool ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
 bool twinkle = true;
@@ -61,12 +64,12 @@ void loop() {
     /* Main controller loop. Handles brightness twinkling, transforming RGB,
     turning on, turning off, and standing by. */
 
-    if (!on && ALL_PIXELS_BRIGHTNESS_ARE_CURRENT && ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT)
+    if (!isOn() && ALL_PIXELS_BRIGHTNESS_ARE_CURRENT && ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT)
         // Controller OFF and dimmed. Do nothing.
         return;
 
     if (!ALL_PIXELS_BRIGHTNESS_ARE_CURRENT) {
-        if (on) {
+        if (isOn()) {
             /* Brighten from   OFF to ON
             Dim from        ON to OFF
             Brighten from   lower brightness to higher brightness (when twinkle is off)
@@ -115,7 +118,7 @@ void loop() {
         /* Either the controller is on but twinkle and transform are both off
             OR
             controller is dimming and twinkling doesn't apply. */
-        if (!twinkle || (twinkle && !on)) {
+        if (!twinkle || (twinkle && !isOn())) {
             if (!ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT)
                 settleAnyTransforms();
             return;
@@ -128,11 +131,11 @@ void loop() {
         Pixel *pixel = &pixels[i];
 
         // Twinkle brightness
-        if (twinkle && on)
+        if (twinkle && isOn())
             pixel->twinkle(this->brightness, this->transform);
         // Transform RGB
-        if ((transform && on) || pixel->transformStepsRemaining) {
-            pixel->transform(this->on, this->transform);
+        if ((transform && isOn()) || pixel->transformStepsRemaining) {
+            pixel->transform(this->isOn(), this->transform);
             if (pixel->transformStepsRemaining == 0)
                 ACTIVE_TRANSFORM_CYCLES_REMAINING--;
         }
@@ -200,7 +203,7 @@ void settleAnyTransforms() {
             ACTIVE_CYCLES_REMAINING--;
             continue;
         }
-        pixel->transform(this->on, this->transform);
+        pixel->transform(this->isOn(), this->transform);
         this->applyPixelSettingsToNeoPixel(i, pixel);
     }
     if (ACTIVE_CYCLES_REMAINING == 0)
@@ -249,7 +252,7 @@ void updateRGBs(String csvPalette) {
     // Update any transform color targets.
     for (byte i = 0; i < numOfPixels; i++) {
         Pixel *pixel = &pixels[i];
-        if (this->on) {
+        if (this->isOn()) {
             if (this->transform || pixel->transformStepsRemaining) {
                 pixel->setNewTransformTargetFromCurrentState();
             } else if (!this->transform && !this->twinkle) {

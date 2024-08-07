@@ -260,9 +260,9 @@ testF(ControllerRGBs, getNeoPixelControllerState) {
     const String brightness = "255";
     const String palette = "9,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,255";
     const String expectedResult =
-        boolByte + "," + 
-        ms + "," + 
-        brightness + "," + 
+        boolByte + "," +
+        ms + "," +
+        brightness + "," +
         palette;
     const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
     assertEqual(result, expectedResult);

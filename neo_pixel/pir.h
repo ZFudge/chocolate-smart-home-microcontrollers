@@ -14,6 +14,11 @@ class PIRSensor {
 public:
 byte pin;
 
+bool armed = true;
+void arm(const bool armed) {
+    this->armed = armed;
+}
+
 byte timeoutInSeconds = 60;
 long lastMotionDetected = 0;
 
@@ -42,6 +47,8 @@ void setTimeoutInSeconds(const byte timeout) {
 }
 
 bool motionDetected() {
+    if (!armed) return false;
+
     return (
         this->getCurrentSensorReading() ||
         this->isStillActive()

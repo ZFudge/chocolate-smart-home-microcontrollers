@@ -11,12 +11,15 @@ using namespace NeoPixel;
 #define TEST_DATA_PIN   6
 #define TEST_NUM_PIX    10
 
+#define TEST_PIR_PIN    5
+
 
 class ControllerProcessMsg: public aunit::TestOnce {
 protected:
     NeoPixelController test_controller;
     void setup() override {
         aunit::TestOnce::setup();
+        test_controller.enable_pir(TEST_PIR_PIN);
         test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
     }
 };
@@ -307,6 +310,18 @@ protected:
 testF(RGBs, getCsvRGBs) {
     const String expectedResult = "0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,255";
     assertEqual(getCsvRGBs(), expectedResult);
+}
+
+testF(ControllerProcessMsg, pir_armed_true) {
+    const String incomingMessage = "armed=1;";
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertTrue(test_controller.pir->armed);
+}
+
+testF(ControllerProcessMsg, pir_armed_false) {
+    const String incomingMessage = "armed=0;";
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertFalse(test_controller.pir->armed);
 }
 
 

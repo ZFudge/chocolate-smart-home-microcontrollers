@@ -24,14 +24,6 @@ test(pir_null) {
     assertEqual(test_controller.pir, NULL);
 }
 
-test(cannot_enable) {
-    /*controller.pir should be null if trying to enable after initializing controller.*/
-    NeoPixelController test_controller;
-    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
-    test_controller.enable_pir(TEST_PIR_PIN);
-    assertEqual(test_controller.pir, NULL);
-}
-
 
 class PIR_1Sec: public aunit::TestOnce {
 protected:
@@ -43,6 +35,18 @@ protected:
         test_controller.pir->setTimeoutInSeconds(1);
     }
 };
+
+testF(PIR_1Sec, disarm) {
+    assertTrue(test_controller.pir->armed);
+    test_controller.pir->arm(0);
+    assertFalse(test_controller.pir->armed);
+}
+
+testF(PIR_1Sec, arm) {
+    test_controller.pir->armed = false;
+    test_controller.pir->arm(1);
+    assertTrue(test_controller.pir->armed);
+}
 
 testF(PIR_1Sec, setTimeoutInSeconds) {
     test_controller.pir->setTimeoutInSeconds(10);
@@ -61,6 +65,26 @@ testF(PIR_1Sec, motionDetected) {
     delay(100);
     assertTrue(test_controller.pir->motionDetected());
     delay(100);
+    assertTrue(test_controller.pir->motionDetected());
+    delay(800);
+    // Timeout window defined by pir->timeoutInSeconds has expired. Motion
+    // should no longer be detected.
+    assertFalse(test_controller.pir->motionDetected());
+}
+
+testF(PIR_1Sec, motionDetected_disarmed) {
+    test_controller.pir->getReading = mockActivePinF;
+    assertTrue(test_controller.pir->motionDetected());
+    test_controller.pir->arm(0);
+    assertFalse(test_controller.pir->motionDetected());
+    // Revert mock reading so that motion is no longer detected.
+    test_controller.pir->getReading = getReadingFromPin;
+    test_controller.pir->arm(1);
+    delay(100);
+    test_controller.pir->arm(0);
+    assertFalse(test_controller.pir->motionDetected());
+    delay(100);
+    test_controller.pir->arm(1);
     assertTrue(test_controller.pir->motionDetected());
     delay(800);
     // Timeout window defined by pir->timeoutInSeconds has expired. Motion

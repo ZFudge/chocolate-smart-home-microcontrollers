@@ -55,6 +55,11 @@ void processNeoPixelMsg(String message, NeoPixel::NeoPixelController *controller
         const String paletteCsvString = msg.substring(0, msg.indexOf(";"));
         controller->updateRGBs(paletteCsvString);
     }
+
+    if (Utils::hasParam("armed", message)) {
+        const bool arm = Utils::getByteValueUsingKey(message, "armed");
+        controller->armPir(arm);
+    }
 }
 
 

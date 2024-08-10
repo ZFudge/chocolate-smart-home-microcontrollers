@@ -32,8 +32,13 @@ byte ms = 0;
 
 PIRSensor* pir = NULL;
 void enable_pir(const byte pirPin) {
-    if (strip.numPixels() > 0) return;
+    if (pir != NULL) return;
     pir = new PIRSensor(pirPin);
+}
+void armPir(const bool armed) {
+    /* "arm" or "disarm" pir sensor readings */
+    if (pir == NULL) return;
+    pir->arm(armed);
 }
 
 void init(const byte dataPin, const byte numOfPixels, neoPixelType npType = NEO_GRB + NEO_KHZ800) {

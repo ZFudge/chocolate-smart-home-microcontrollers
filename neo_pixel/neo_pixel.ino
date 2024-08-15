@@ -11,6 +11,8 @@
 #define LED_WIFI   19
 #define LED_MQTT   18
 
+#define PIR_PIN    15
+
 
 NeoPixel::NeoPixelController np_controller;
 
@@ -30,6 +32,9 @@ void setup() {
     pinMode(LED_MQTT, OUTPUT);
     digitalWrite(LED_WIFI, LOW);
     digitalWrite(LED_MQTT, LOW);
+
+    np_controller.enable_pir(PIR_PIN);
+    // np_controller.setMaxCount(25);
     // np_controller.init(DATA_PIN, NUM_PIX, NEO_GRB + NEO_KHZ800);
     np_controller.init(DATA_PIN, NUM_PIX, NEO_RGB + NEO_KHZ800);
     np_controller.setMS(5);

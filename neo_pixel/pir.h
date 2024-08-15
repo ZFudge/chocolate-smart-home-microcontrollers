@@ -23,19 +23,6 @@ byte timeoutInSeconds = 60;
 long lastMotionDetected = 0;
 
 bool (*getReading)(const byte) = getReadingFromPin;
-bool getCurrentSensorReading() {
-    const bool motionDetected = getReading(pin);
-    if (motionDetected)
-        lastMotionDetected = millis();
-    return motionDetected;
-};
-
-bool isStillActive() {
-    /* Returns true if motion has been detected within the time window defined
-    by timeoutInSeconds */
-    const int secondsLapsedSinceLastReading = (millis() - lastMotionDetected) / 1000;
-    return secondsLapsedSinceLastReading < timeoutInSeconds;
-};
 
 PIRSensor(const byte pin) {
     this->pin = pin;
@@ -44,15 +31,6 @@ PIRSensor(const byte pin) {
 
 void setTimeoutInSeconds(const byte timeout) {
     this->timeoutInSeconds = timeout;
-}
-
-bool motionDetected() {
-    if (!armed) return false;
-
-    return (
-        this->getCurrentSensorReading() ||
-        this->isStillActive()
-    );
 }
 
 };

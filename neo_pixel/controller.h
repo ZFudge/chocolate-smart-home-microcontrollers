@@ -11,7 +11,58 @@
 namespace NeoPixel {
 
 
-struct NeoPixelController : public Adafruit_NeoPixel {
+struct NeoPixelPIRControl {
+    PIRSensor* pir = NULL;
+    bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+
+    void enable_pir(const byte pirPin) {
+        if (pir != NULL) return;
+        pir = new PIRSensor(pirPin);
+    }
+    void armPir(const bool armed) {
+        /* "arm" or "disarm" pir sensor readings */
+        if (pir == NULL) return;
+        pir->arm(armed);
+    }
+
+    bool pirOn() {
+        return pir != NULL && motionDetected();
+    }
+
+    bool getCurrentSensorReading() {
+        const bool motionDetected = pir->getReading(pir->pin);
+        if (motionDetected) {
+            pir->lastMotionDetected = millis();
+            ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+        }
+        return motionDetected;
+    };
+
+    bool lastReading;
+    bool motionDetected() {
+        if (!pir->armed) return false;
+
+        const bool stillActive = isStillActive();
+        const bool reading = getCurrentSensorReading();
+        if (lastReading && !stillActive && !reading && ALL_PIXELS_BRIGHTNESS_ARE_CURRENT)
+            ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+
+        lastReading = stillActive || reading;
+        return lastReading;
+    }
+
+    bool isStillActive() {
+        /* Returns true if motion has been detected within the time window defined
+        by timeoutInSeconds */
+        const int secondsLapsedSinceLastReading = (millis() - pir->lastMotionDetected) / 1000;
+        const bool stillActive = secondsLapsedSinceLastReading < pir->timeoutInSeconds;
+
+        return stillActive;
+    };
+};
+
+
+struct NeoPixelController : public NeoPixelPIRControl, Adafruit_NeoPixel {
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel();
 Pixel* pixels = NULL;
@@ -21,36 +72,23 @@ byte numOfPixels = 0;
 byte maxCount = 50;
 bool on = true;
 bool isOn() {
-    return on || (this->pir && pir->motionDetected());
+    return on || this->pirOn();
 };
-bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+
 bool ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
 bool twinkle = true;
 bool transform = true;
 byte brightness = 255;
 byte ms = 0;
 
-PIRSensor* pir = NULL;
-void enable_pir(const byte pirPin) {
-    if (pir != NULL) return;
-    pir = new PIRSensor(pirPin);
-}
-void armPir(const bool armed) {
-    /* "arm" or "disarm" pir sensor readings */
-    if (pir == NULL) return;
-    pir->arm(armed);
-}
-
 void init(const byte dataPin, const byte numOfPixels, neoPixelType npType = NEO_GRB + NEO_KHZ800) {
-    if (strip.numPixels() || numOfPixels == 0)
-        return;
+    if (strip.numPixels() > 0 || numOfPixels == 0) return;
 
     // If the number of pixels is greater than the max count, the smaller of
     // the two values will be used for initializing the number of pixel objects,
     // with each pixel object representing neo pixels numbered as:
     //      n, n+maxCount, n+maxCount*2, ...
     // with the pattern ending when n+maxCount*index exceeds numOfPixels
-    // this->numOfPixels = numOfPixels;
     this->numOfPixels = min(numOfPixels, maxCount);
 
     strip.updateType(npType);
@@ -162,13 +200,16 @@ void turnOnOff(const bool on) {
     this->on = on;
     this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 };
+
 void setMS(const byte ms) {
     this->ms = ms;
 };
+
 void setMaxCount(const byte maxCount) {
-    if (maxCount == 0 || this->numOfPixels > 0) return;
+    if (maxCount == 0 || this->strip.numPixels() > 0) return;
     this->maxCount = maxCount;
 };
+
 void setBrightness(const byte brightness) {
     if (brightness == this->brightness)
         return;
@@ -181,6 +222,7 @@ void setBrightness(const byte brightness) {
     this->brightness = brightness;
     this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 };
+
 void setTwinkle(const bool twinkle) {
     this->twinkle = twinkle;
 
@@ -193,11 +235,13 @@ void setTwinkle(const bool twinkle) {
         }
     }
 };
+
 void setTransform(const bool transform) {
     this->transform = transform;
     if (this->transform)
         ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
 };
+
 void settleAnyTransforms() {
     /* Increments any transform cycles towards completion, after transform has
     been turned off. */
@@ -273,6 +317,7 @@ void updateRGBs(String csvPalette) {
 }
 
 };
+
 
 }
 

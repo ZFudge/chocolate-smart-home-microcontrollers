@@ -12,53 +12,56 @@ namespace NeoPixel {
 
 
 struct NeoPixelPIRControl {
-    PIRSensor* pir = NULL;
-    bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+PIRSensor* pir = NULL;
+bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 
-    void enable_pir(const byte pirPin) {
-        if (pir != NULL) return;
-        pir = new PIRSensor(pirPin);
+bool lastReading;
+
+void enable_pir(const byte pirPin) {
+    if (pir != NULL) return;
+    pir = new PIRSensor(pirPin);
+}
+
+void armPir(const bool armed) {
+    /* "arm" or "disarm" pir sensor readings */
+    if (pir == NULL) return;
+    pir->arm(armed);
+}
+
+bool pirIsOn() {
+    return pir != NULL && motionDetected();
+}
+
+bool getCurrentSensorReading() {
+    const bool motionDetected = pir->getReading(pir->pin);
+    if (motionDetected) {
+        pir->lastMotionDetected = millis();
+        this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
     }
-    void armPir(const bool armed) {
-        /* "arm" or "disarm" pir sensor readings */
-        if (pir == NULL) return;
-        pir->arm(armed);
-    }
+    return motionDetected;
+};
 
-    bool pirOn() {
-        return pir != NULL && motionDetected();
-    }
+bool motionDetected() {
+    if (!pir->armed) return false;
 
-    bool getCurrentSensorReading() {
-        const bool motionDetected = pir->getReading(pir->pin);
-        if (motionDetected) {
-            pir->lastMotionDetected = millis();
-            ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
-        }
-        return motionDetected;
-    };
+    const bool stillActive = isStillActive();
+    const bool reading = getCurrentSensorReading();
+    if (lastReading && !stillActive && !reading && this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT)
+        this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 
-    bool lastReading;
-    bool motionDetected() {
-        if (!pir->armed) return false;
+    lastReading = stillActive || reading;
+    return lastReading;
+}
 
-        const bool stillActive = isStillActive();
-        const bool reading = getCurrentSensorReading();
-        if (lastReading && !stillActive && !reading && ALL_PIXELS_BRIGHTNESS_ARE_CURRENT)
-            ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+bool isStillActive() {
+    /* Returns true if motion has been detected within the time window defined
+    by timeoutInSeconds */
+    const int secondsLapsedSinceLastReading = (millis() - pir->lastMotionDetected) / 1000;
+    const bool stillActive = secondsLapsedSinceLastReading < pir->timeoutInSeconds;
 
-        lastReading = stillActive || reading;
-        return lastReading;
-    }
+    return stillActive;
+};
 
-    bool isStillActive() {
-        /* Returns true if motion has been detected within the time window defined
-        by timeoutInSeconds */
-        const int secondsLapsedSinceLastReading = (millis() - pir->lastMotionDetected) / 1000;
-        const bool stillActive = secondsLapsedSinceLastReading < pir->timeoutInSeconds;
-
-        return stillActive;
-    };
 };
 
 
@@ -72,7 +75,7 @@ byte numOfPixels = 0;
 byte maxCount = 50;
 bool on = true;
 bool isOn() {
-    return on || this->pirOn();
+    return on || this->pirIsOn();
 };
 
 bool ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
@@ -107,11 +110,11 @@ void loop() {
     /* Main controller loop. Handles brightness twinkling, transforming RGB,
     turning on, turning off, and standing by. */
 
-    if (!isOn() && ALL_PIXELS_BRIGHTNESS_ARE_CURRENT && ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT)
+    if (!isOn() && this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT && ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT)
         // Controller OFF and dimmed. Do nothing.
         return;
 
-    if (!ALL_PIXELS_BRIGHTNESS_ARE_CURRENT) {
+    if (!this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT) {
         if (isOn()) {
             /* Brighten from   OFF to ON
             Dim from        ON to OFF
@@ -119,7 +122,7 @@ void loop() {
             Dim from        higher brightness to lower brightness (when twinkle is off) */
             if (twinkle) {
                 // Pixels will automatically twinkle at the appropriate brightness.
-                ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
+                this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
             } else {
                 // Manually turn on.
                 bool DONE_CHANGING_BRIGHTNESS = true;
@@ -230,7 +233,7 @@ void setTwinkle(const bool twinkle) {
     // Trigger brightness of pixels settling at controller brightness setting.
     for (byte i = 0; i < numOfPixels; i++) {
         if (pixels[i].brightness != this->brightness) {
-            ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+            this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
             break;
         }
     }

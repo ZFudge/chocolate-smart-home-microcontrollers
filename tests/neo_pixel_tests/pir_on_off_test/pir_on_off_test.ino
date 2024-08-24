@@ -102,7 +102,7 @@ testF(PIR_transform_no_twinkle, on_off) {
 
         assertFalse(test_controller.isOn());
         assertFalse(test_controller.on);
-        assertFalse(test_controller.pirOn());
+        assertFalse(test_controller.pirIsOn());
         assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
         for (byte i = 0; i < TEST_NUM_PIX; i++) {
             assertEqual(test_controller.pixels[i].brightness, expBrightness);
@@ -194,7 +194,7 @@ testF(PIR_transform_twinkle, on_off) {
 
         assertFalse(test_controller.isOn());
         assertFalse(test_controller.on);
-        assertFalse(test_controller.pirOn());
+        assertFalse(test_controller.pirIsOn());
         assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
         for (byte i = 0; i < TEST_NUM_PIX; i++) {
             assertEqual(test_controller.pixels[i].brightness, expBrightness);
@@ -288,7 +288,7 @@ testF(PIR_no_transform_no_twinkle, on_off) {
 
         assertFalse(test_controller.isOn());
         assertFalse(test_controller.on);
-        assertFalse(test_controller.pirOn());
+        assertFalse(test_controller.pirIsOn());
         assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
         for (byte i = 0; i < TEST_NUM_PIX; i++) {
             assertEqual(test_controller.pixels[i].brightness, expBrightness);

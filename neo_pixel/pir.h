@@ -1,14 +1,12 @@
 #ifndef PIRSENSOR_H_
 #define PIRSENSOR_H_
 
-#include <Arduino.h>
-
 
 bool getReadingFromPin(const byte pin) {
-    /* Defined outside of PIRSensor so PIRSensor.getReading can be mocked
-    during testing. */
+    /* Defined outside of PIRSensor so PIRSensor.getReading can be mocked during testing. */
     return digitalRead(pin);
 }
+
 
 class PIRSensor {
 public:

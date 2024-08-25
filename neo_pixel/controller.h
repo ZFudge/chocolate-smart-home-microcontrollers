@@ -11,7 +11,7 @@
 namespace NeoPixel {
 
 
-struct NeoPixelPIRControl {
+struct NeoPixelPIRController {
 PIRSensor* pir = NULL;
 bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 
@@ -65,7 +65,7 @@ bool isStillActive() {
 };
 
 
-struct NeoPixelController : public NeoPixelPIRControl, Adafruit_NeoPixel {
+struct NeoPixelController : public NeoPixelPIRController, Adafruit_NeoPixel {
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel();
 Pixel* pixels = NULL;

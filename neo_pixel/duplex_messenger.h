@@ -56,10 +56,18 @@ void processNeoPixelMsg(String message, NeoPixel::NeoPixelController *controller
         controller->updateRGBs(paletteCsvString);
     }
 
-    if (Utils::hasParam("armed", message)) {
-        const bool arm = Utils::getByteValueUsingKey(message, "armed");
+    // PIR start
+    if (Utils::hasParam("pir_armed", message)) {
+        const bool arm = Utils::getByteValueUsingKey(message, "pir_armed");
         controller->armPir(arm);
     }
+
+    if (Utils::hasParam("pir_timeout", message)) {
+        const byte timeout = Utils::getByteValueUsingKey(message, "pir_timeout");
+        controller->pir->setTimeoutInSeconds(timeout);
+    }
+    // PIR end
+
 }
 
 

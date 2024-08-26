@@ -11,73 +11,53 @@
 namespace NeoPixel {
 
 
-struct NeoPixelPIRController {
-PIRSensor* pir = NULL;
-bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+struct NeoPixelController;
 
-bool lastReading;
-
-void enable_pir(const byte pirPin) {
-    if (pir != NULL) return;
-    pir = new PIRSensor(pirPin);
-}
-
-void armPir(const bool armed) {
-    /* "arm" or "disarm" pir sensor readings */
-    if (pir == NULL) return;
-    pir->arm(armed);
-}
-
-bool pirIsOn() {
-    return pir != NULL && motionDetected();
-}
-
-bool getCurrentSensorReading() {
-    const bool motionDetected = pir->getReading(pir->pin);
-    if (motionDetected) {
-        pir->lastMotionDetected = millis();
-        this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+class PIRReader : public PIRSensor {
+public:
+    // pir needs to read/write the corresponding neo pixel controller's
+    // ALL_PIXELS_BRIGHTNESS_ARE_CURRENT value inside motionDetected and
+    // getCurrentSensorReading. 
+    NeoPixelController* neo_pixel_controller = NULL;
+    bool motionDetected();
+    bool getCurrentSensorReading();
+    bool lastReading;
+    PIRReader(const byte pin) {
+        this->pin = pin;
+        pinMode(pin, INPUT);
     }
-    return motionDetected;
-};
-
-bool motionDetected() {
-    if (!pir->armed) return false;
-
-    const bool stillActive = isStillActive();
-    const bool reading = getCurrentSensorReading();
-    if (lastReading && !stillActive && !reading && this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT)
-        this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
-
-    lastReading = stillActive || reading;
-    return lastReading;
-}
-
-bool isStillActive() {
-    /* Returns true if motion has been detected within the time window defined
-    by timeoutInSeconds */
-    const int secondsLapsedSinceLastReading = (millis() - pir->lastMotionDetected) / 1000;
-    const bool stillActive = secondsLapsedSinceLastReading < pir->timeoutInSeconds;
-
-    return stillActive;
-};
-
 };
 
 
-struct NeoPixelController : public NeoPixelPIRController, Adafruit_NeoPixel {
+struct NeoPixelController : public Adafruit_NeoPixel {
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel();
 Pixel* pixels = NULL;
+
+PIRReader* pir = NULL;
+
+NeoPixelController() {}
+NeoPixelController(PIRReader pir) {
+    this->pir = &pir;
+    this->pir->neo_pixel_controller = this;
+}
+NeoPixelController(PIRReader *pir) {
+    this->pir = pir;
+    this->pir->neo_pixel_controller = this;
+}
 
 byte numOfPixels = 0;
 // Maximum number of pixel objects allowed.
 byte maxCount = 50;
 bool on = true;
-bool isOn() {
-    return on || this->pirIsOn();
+bool pirIsOn() {
+    // Check any PIR sensor readings 
+    return pir != NULL && pir->motionDetected();
 };
-
+bool isOn() {
+    return on || pirIsOn();
+};
+bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 bool ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
 bool twinkle = true;
 bool transform = true;
@@ -122,7 +102,7 @@ void loop() {
             Dim from        higher brightness to lower brightness (when twinkle is off) */
             if (twinkle) {
                 // Pixels will automatically twinkle at the appropriate brightness.
-                this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
+                ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
             } else {
                 // Manually turn on.
                 bool DONE_CHANGING_BRIGHTNESS = true;
@@ -139,7 +119,7 @@ void loop() {
                         this->applyPixelSettingsToNeoPixel(i, pixel);
                 }
                 if (DONE_CHANGING_BRIGHTNESS)
-                    this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
+                    ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
             }
         } else {
             /* Dim from ON to OFF */
@@ -156,7 +136,7 @@ void loop() {
                     this->applyPixelSettingsToNeoPixel(i, pixel);
             }
             if (DONE_TURNING_OFF)
-                this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
+                ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
         }
     }
 
@@ -201,7 +181,7 @@ void turnOnOff(const bool on) {
     if (this->on == on)
         return;
     this->on = on;
-    this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+    ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 };
 
 void setMS(const byte ms) {
@@ -223,7 +203,7 @@ void setBrightness(const byte brightness) {
         return;
     }
     this->brightness = brightness;
-    this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+    ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 };
 
 void setTwinkle(const bool twinkle) {
@@ -233,7 +213,7 @@ void setTwinkle(const bool twinkle) {
     // Trigger brightness of pixels settling at controller brightness setting.
     for (byte i = 0; i < numOfPixels; i++) {
         if (pixels[i].brightness != this->brightness) {
-            this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+            ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
             break;
         }
     }
@@ -320,6 +300,28 @@ void updateRGBs(String csvPalette) {
 }
 
 };
+
+
+bool PIRReader::getCurrentSensorReading() {
+    const bool motionDetected = getReading(pin);
+    if (motionDetected) {
+        lastMotionDetected = millis();
+        neo_pixel_controller->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+    }
+    return motionDetected;
+};
+
+bool PIRReader::motionDetected() {
+    if (!armed) return false;
+
+    const bool stillActive = isStillActive();
+    const bool reading = getCurrentSensorReading();
+    if (lastReading && !stillActive && !reading && neo_pixel_controller->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT)
+        neo_pixel_controller->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+
+    lastReading = stillActive || reading;
+    return lastReading;
+}
 
 
 }

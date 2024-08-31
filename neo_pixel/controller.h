@@ -5,9 +5,24 @@
 
 #include "consts.h"
 #include "pixel.h"
+#include "pir.h"
 
 
 namespace NeoPixel {
+
+
+struct NeoPixelController;
+
+class PIRReader : public PIRSensor {
+public:
+    // pir needs to read/write the corresponding neo pixel controller's
+    // ALL_PIXELS_BRIGHTNESS_ARE_CURRENT value inside motionDetected and
+    // getCurrentSensorReading. 
+    NeoPixelController* neo_pixel_controller = NULL;
+    bool motionDetected();
+    bool getCurrentSensorReading();
+    bool lastReading;
+};
 
 
 struct NeoPixelController : public Adafruit_NeoPixel {
@@ -15,10 +30,19 @@ struct NeoPixelController : public Adafruit_NeoPixel {
 Adafruit_NeoPixel strip = Adafruit_NeoPixel();
 Pixel* pixels = NULL;
 
+PIRReader* pir = NULL;
+
 byte numOfPixels = 0;
 // Maximum number of pixel objects allowed.
 byte maxCount = 50;
 bool on = true;
+bool pirIsOn() {
+    // Check any PIR sensor readings 
+    return pir != NULL && pir->motionDetected();
+};
+bool isOn() {
+    return on || pirIsOn();
+};
 bool ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 bool ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
 bool twinkle = true;
@@ -27,15 +51,13 @@ byte brightness = 255;
 byte ms = 0;
 
 void init(const byte dataPin, const byte numOfPixels, neoPixelType npType = NEO_GRB + NEO_KHZ800) {
-    if (strip.numPixels() || numOfPixels == 0)
-        return;
+    if (strip.numPixels() > 0 || numOfPixels == 0) return;
 
     // If the number of pixels is greater than the max count, the smaller of
     // the two values will be used for initializing the number of pixel objects,
     // with each pixel object representing neo pixels numbered as:
     //      n, n+maxCount, n+maxCount*2, ...
     // with the pattern ending when n+maxCount*index exceeds numOfPixels
-    // this->numOfPixels = numOfPixels;
     this->numOfPixels = min(numOfPixels, maxCount);
 
     strip.updateType(npType);
@@ -54,12 +76,12 @@ void loop() {
     /* Main controller loop. Handles brightness twinkling, transforming RGB,
     turning on, turning off, and standing by. */
 
-    if (!on && ALL_PIXELS_BRIGHTNESS_ARE_CURRENT && ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT)
+    if (!isOn() && this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT && ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT)
         // Controller OFF and dimmed. Do nothing.
         return;
 
-    if (!ALL_PIXELS_BRIGHTNESS_ARE_CURRENT) {
-        if (on) {
+    if (!this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT) {
+        if (isOn()) {
             /* Brighten from   OFF to ON
             Dim from        ON to OFF
             Brighten from   lower brightness to higher brightness (when twinkle is off)
@@ -83,7 +105,7 @@ void loop() {
                         this->applyPixelSettingsToNeoPixel(i, pixel);
                 }
                 if (DONE_CHANGING_BRIGHTNESS)
-                    this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
+                    ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
             }
         } else {
             /* Dim from ON to OFF */
@@ -100,7 +122,7 @@ void loop() {
                     this->applyPixelSettingsToNeoPixel(i, pixel);
             }
             if (DONE_TURNING_OFF)
-                this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
+                ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
         }
     }
 
@@ -108,7 +130,7 @@ void loop() {
         /* Either the controller is on but twinkle and transform are both off
             OR
             controller is dimming and twinkling doesn't apply. */
-        if (!twinkle || (twinkle && !on)) {
+        if (!twinkle || (twinkle && !isOn())) {
             if (!ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT)
                 settleAnyTransforms();
             return;
@@ -121,11 +143,11 @@ void loop() {
         Pixel *pixel = &pixels[i];
 
         // Twinkle brightness
-        if (twinkle && on)
+        if (twinkle && isOn())
             pixel->twinkle(this->brightness, this->transform);
         // Transform RGB
-        if ((transform && on) || pixel->transformStepsRemaining) {
-            pixel->transform(this->on, this->transform);
+        if ((transform && isOn()) || pixel->transformStepsRemaining) {
+            pixel->transform(this->isOn(), this->transform);
             if (pixel->transformStepsRemaining == 0)
                 ACTIVE_TRANSFORM_CYCLES_REMAINING--;
         }
@@ -145,15 +167,18 @@ void turnOnOff(const bool on) {
     if (this->on == on)
         return;
     this->on = on;
-    this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+    ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 };
+
 void setMS(const byte ms) {
     this->ms = ms;
 };
+
 void setMaxCount(const byte maxCount) {
-    if (maxCount == 0 || this->numOfPixels > 0) return;
+    if (maxCount == 0 || this->strip.numPixels() > 0) return;
     this->maxCount = maxCount;
 };
+
 void setBrightness(const byte brightness) {
     if (brightness == this->brightness)
         return;
@@ -164,8 +189,9 @@ void setBrightness(const byte brightness) {
         return;
     }
     this->brightness = brightness;
-    this->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+    ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
 };
+
 void setTwinkle(const bool twinkle) {
     this->twinkle = twinkle;
 
@@ -178,11 +204,13 @@ void setTwinkle(const bool twinkle) {
         }
     }
 };
+
 void setTransform(const bool transform) {
     this->transform = transform;
     if (this->transform)
         ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
 };
+
 void settleAnyTransforms() {
     /* Increments any transform cycles towards completion, after transform has
     been turned off. */
@@ -193,7 +221,7 @@ void settleAnyTransforms() {
             ACTIVE_CYCLES_REMAINING--;
             continue;
         }
-        pixel->transform(this->on, this->transform);
+        pixel->transform(this->isOn(), this->transform);
         this->applyPixelSettingsToNeoPixel(i, pixel);
     }
     if (ACTIVE_CYCLES_REMAINING == 0)
@@ -242,7 +270,7 @@ void updateRGBs(String csvPalette) {
     // Update any transform color targets.
     for (byte i = 0; i < numOfPixels; i++) {
         Pixel *pixel = &pixels[i];
-        if (this->on) {
+        if (this->isOn()) {
             if (this->transform || pixel->transformStepsRemaining) {
                 pixel->setNewTransformTargetFromCurrentState();
             } else if (!this->transform && !this->twinkle) {
@@ -258,6 +286,37 @@ void updateRGBs(String csvPalette) {
 }
 
 };
+
+
+bool PIRReader::getCurrentSensorReading() {
+    const bool motionDetected = getReading(pin);
+    if (motionDetected) {
+        lastMotionDetected = millis();
+        neo_pixel_controller->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+    }
+    return motionDetected;
+};
+
+bool PIRReader::motionDetected() {
+    if (!armed) return false;
+
+    const bool stillActive = isStillActive();
+    const bool reading = getCurrentSensorReading();
+    if (lastReading && !stillActive && !reading && neo_pixel_controller->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT)
+        neo_pixel_controller->ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = false;
+
+    lastReading = stillActive || reading;
+    return lastReading;
+}
+
+
+void bindNPCToPIR(NeoPixelController *npc, PIRReader *pr) {
+    /*Must be called in setup() function.
+    Allow neo pixel controller and pir to reference each other. */
+    npc->pir = pr;
+    pr->neo_pixel_controller = npc;
+}
+
 
 }
 

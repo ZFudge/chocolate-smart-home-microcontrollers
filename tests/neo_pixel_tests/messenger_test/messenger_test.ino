@@ -11,13 +11,18 @@ using namespace NeoPixel;
 #define TEST_DATA_PIN   6
 #define TEST_NUM_PIX    10
 
+#define TEST_PIR_PIN    5
+
 
 class ControllerProcessMsg: public aunit::TestOnce {
 protected:
     NeoPixelController test_controller;
+    PIRReader test_pir;
     void setup() override {
         aunit::TestOnce::setup();
         test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+        test_pir.init(TEST_PIR_PIN);
+        bindNPCToPIR(&test_controller, &test_pir);
     }
 };
 
@@ -88,10 +93,7 @@ testF(ControllerProcessMsg, processNeoPixelMsg_ms) {
 
 testF(ControllerProcessMsg, processNeoPixelMsg_brightness) {
     const String incomingMessage = "brightness=123;";
-    DuplexMessenger::processNeoPixelMsg(
-        incomingMessage,
-        &test_controller
-    );
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertEqual(test_controller.brightness, 123);
 }
 
@@ -260,9 +262,9 @@ testF(ControllerRGBs, getNeoPixelControllerState) {
     const String brightness = "255";
     const String palette = "9,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,255";
     const String expectedResult =
-        boolByte + "," + 
-        ms + "," + 
-        brightness + "," + 
+        boolByte + "," +
+        ms + "," +
+        brightness + "," +
         palette;
     const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
     assertEqual(result, expectedResult);
@@ -307,6 +309,36 @@ protected:
 testF(RGBs, getCsvRGBs) {
     const String expectedResult = "0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,255";
     assertEqual(getCsvRGBs(), expectedResult);
+}
+
+testF(ControllerProcessMsg, pir_armed_true) {
+    const String incomingMessage = "pir_armed=1;";
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertTrue(test_controller.pir->armed);
+}
+
+testF(ControllerProcessMsg, pir_armed_false) {
+    const String incomingMessage = "pir_armed=0;";
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertFalse(test_controller.pir->armed);
+}
+
+testF(ControllerProcessMsg, pir_timeout) {
+    String incomingMessage = "pir_timeout=255;";
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertEqual(test_controller.pir->timeoutInSeconds, 255);
+
+    incomingMessage = "pir_timeout=123;";
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertEqual(test_controller.pir->timeoutInSeconds, 123);
+
+    incomingMessage = "pir_timeout=10;";
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertEqual(test_controller.pir->timeoutInSeconds, 10);
+
+    incomingMessage = "pir_timeout=1;";
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertEqual(test_controller.pir->timeoutInSeconds, 1);
 }
 
 

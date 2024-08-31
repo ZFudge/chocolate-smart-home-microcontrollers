@@ -55,6 +55,21 @@ void processNeoPixelMsg(String message, NeoPixel::NeoPixelController *controller
         const String paletteCsvString = msg.substring(0, msg.indexOf(";"));
         controller->updateRGBs(paletteCsvString);
     }
+
+    // PIR start
+    if (Utils::hasParam("pir_armed", message)) {
+        if (controller->pir == NULL) return;
+        const bool arm = Utils::getByteValueUsingKey(message, "pir_armed");
+        controller->pir->arm(arm);
+    }
+
+    if (Utils::hasParam("pir_timeout", message)) {
+        if (controller->pir == NULL) return;
+        const byte timeout = Utils::getByteValueUsingKey(message, "pir_timeout");
+        controller->pir->setTimeoutInSeconds(timeout);
+    }
+    // PIR end
+
 }
 
 

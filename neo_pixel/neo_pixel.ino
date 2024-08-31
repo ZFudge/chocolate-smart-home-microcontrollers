@@ -5,14 +5,17 @@
 
 
 #define DATA_PIN   5
-#define NUM_PIX    50
-
+#define NUM_PIX    100
 
 #define LED_WIFI   19
 #define LED_MQTT   18
 
+#define PIR_PIN    15
 
-NeoPixel::NeoPixelController np_controller;
+
+NeoPixel::NeoPixelController    np_controller;
+
+NeoPixel::PIRReader             pir_reader;
 
 
 String getControllerState() {
@@ -30,9 +33,13 @@ void setup() {
     pinMode(LED_MQTT, OUTPUT);
     digitalWrite(LED_WIFI, LOW);
     digitalWrite(LED_MQTT, LOW);
+
+    // np_controller.setMaxCount(25);
     // np_controller.init(DATA_PIN, NUM_PIX, NEO_GRB + NEO_KHZ800);
     np_controller.init(DATA_PIN, NUM_PIX, NEO_RGB + NEO_KHZ800);
     np_controller.setMS(5);
+    pir_reader.init(PIR_PIN);
+    bindNPCToPIR(&np_controller, &pir_reader);
 
     // Use controller-specific methods for instructing controller state.
     CsmEspConn::controller.setGetState(getControllerState);

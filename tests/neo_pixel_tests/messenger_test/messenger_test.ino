@@ -16,13 +16,13 @@ using namespace NeoPixel;
 
 class ControllerProcessMsg: public aunit::TestOnce {
 protected:
-    NeoPixelController *test_controller = NULL;
-    PIRReader *test_pir = NULL;
+    NeoPixelController test_controller;
+    PIRReader test_pir;
     void setup() override {
         aunit::TestOnce::setup();
-        test_pir = new PIRReader(TEST_PIR_PIN);
-        test_controller = new NeoPixelController(test_pir);
-        test_controller->init(TEST_DATA_PIN, TEST_NUM_PIX);
+        test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+        test_pir.init(TEST_PIR_PIN);
+        bindNPCToPIR(&test_controller, &test_pir);
     }
 };
 
@@ -75,59 +75,56 @@ testF(ControllerProcessMsg, getByteValueUsingKey_transform_false) {
 // processNeoPixelMsg start
 testF(ControllerProcessMsg, processNeoPixelMsg_on) {
     const String incomingMessage = "on=1;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
-    assertTrue(test_controller->on);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertTrue(test_controller.on);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_off) {
     const String incomingMessage = "on=0;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
-    assertFalse(test_controller->on);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertFalse(test_controller.on);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_ms) {
     const String incomingMessage = "ms=5;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
-    assertEqual(test_controller->ms, 5);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertEqual(test_controller.ms, 5);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_brightness) {
     const String incomingMessage = "brightness=123;";
-    DuplexMessenger::processNeoPixelMsg(
-        incomingMessage,
-        test_controller
-    );
-    assertEqual(test_controller->brightness, 123);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertEqual(test_controller.brightness, 123);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_twinkle_true) {
     const String incomingMessage = "twinkle=1;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
-    assertTrue(test_controller->twinkle);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertTrue(test_controller.twinkle);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_twinkle_false) {
     const String incomingMessage = "twinkle=0;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
-    assertFalse(test_controller->twinkle);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertFalse(test_controller.twinkle);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_transform_true) {
     const String incomingMessage = "transform=1;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
-    assertTrue(test_controller->transform);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertTrue(test_controller.transform);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_transform_false) {
     const String incomingMessage = "transform=0;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
-    assertFalse(test_controller->transform);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertFalse(test_controller.transform);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_palette) {
     const String incomingMessage =
         "palette=0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,255;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertEqual(rgbs[0][0], 0);
     assertEqual(rgbs[0][1], 10);
     assertEqual(rgbs[0][2], 20);
@@ -168,19 +165,19 @@ testF(ControllerProcessMsg, processNeoPixelMsg_all) {
         (String)"transform=0;" +
         (String)"palette=0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,255;";
 
-    assertTrue(test_controller->on);
-    assertEqual(test_controller->brightness, 255);
-    assertEqual(test_controller->ms, 0);
-    assertTrue(test_controller->twinkle);
-    assertTrue(test_controller->transform);
+    assertTrue(test_controller.on);
+    assertEqual(test_controller.brightness, 255);
+    assertEqual(test_controller.ms, 0);
+    assertTrue(test_controller.twinkle);
+    assertTrue(test_controller.transform);
 
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
 
-    assertFalse(test_controller->on);
-    assertEqual(test_controller->brightness, 234);
-    assertEqual(test_controller->ms, 7);
-    assertFalse(test_controller->twinkle);
-    assertFalse(test_controller->transform);
+    assertFalse(test_controller.on);
+    assertEqual(test_controller.brightness, 234);
+    assertEqual(test_controller.ms, 7);
+    assertFalse(test_controller.twinkle);
+    assertFalse(test_controller.transform);
     assertEqual(rgbs[0][0], 0);
     assertEqual(rgbs[0][1], 10);
     assertEqual(rgbs[0][2], 20);
@@ -316,32 +313,32 @@ testF(RGBs, getCsvRGBs) {
 
 testF(ControllerProcessMsg, pir_armed_true) {
     const String incomingMessage = "pir_armed=1;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
-    assertTrue(test_controller->pir->armed);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertTrue(test_controller.pir->armed);
 }
 
 testF(ControllerProcessMsg, pir_armed_false) {
     const String incomingMessage = "pir_armed=0;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
-    assertFalse(test_controller->pir->armed);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertFalse(test_controller.pir->armed);
 }
 
 testF(ControllerProcessMsg, pir_timeout) {
     String incomingMessage = "pir_timeout=255;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
-    assertEqual(test_controller->pir->timeoutInSeconds, 255);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertEqual(test_controller.pir->timeoutInSeconds, 255);
 
     incomingMessage = "pir_timeout=123;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
-    assertEqual(test_controller->pir->timeoutInSeconds, 123);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertEqual(test_controller.pir->timeoutInSeconds, 123);
 
     incomingMessage = "pir_timeout=10;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
-    assertEqual(test_controller->pir->timeoutInSeconds, 10);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertEqual(test_controller.pir->timeoutInSeconds, 10);
 
     incomingMessage = "pir_timeout=1;";
-    DuplexMessenger::processNeoPixelMsg(incomingMessage, test_controller);
-    assertEqual(test_controller->pir->timeoutInSeconds, 1);
+    DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
+    assertEqual(test_controller.pir->timeoutInSeconds, 1);
 }
 
 

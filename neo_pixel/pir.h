@@ -22,8 +22,7 @@ long lastMotionDetected = 0;
 
 bool (*getReading)(const byte) = getReadingFromPin;
 
-PIRSensor() {}
-PIRSensor(const byte pin) {
+void init(const byte pin) {
     this->pin = pin;
     pinMode(pin, INPUT);
 }

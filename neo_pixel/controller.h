@@ -22,10 +22,6 @@ public:
     bool motionDetected();
     bool getCurrentSensorReading();
     bool lastReading;
-    PIRReader(const byte pin) {
-        this->pin = pin;
-        pinMode(pin, INPUT);
-    }
 };
 
 
@@ -35,16 +31,6 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel();
 Pixel* pixels = NULL;
 
 PIRReader* pir = NULL;
-
-NeoPixelController() {}
-NeoPixelController(PIRReader pir) {
-    this->pir = &pir;
-    this->pir->neo_pixel_controller = this;
-}
-NeoPixelController(PIRReader *pir) {
-    this->pir = pir;
-    this->pir->neo_pixel_controller = this;
-}
 
 byte numOfPixels = 0;
 // Maximum number of pixel objects allowed.
@@ -321,6 +307,14 @@ bool PIRReader::motionDetected() {
 
     lastReading = stillActive || reading;
     return lastReading;
+}
+
+
+void bindNPCToPIR(NeoPixelController *npc, PIRReader *pr) {
+    /*Must be called in setup() function.
+    Allow neo pixel controller and pir to reference each other. */
+    npc->pir = pr;
+    pr->neo_pixel_controller = npc;
 }
 
 

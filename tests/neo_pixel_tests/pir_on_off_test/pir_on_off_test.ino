@@ -59,7 +59,7 @@ testF(PIR_transform_no_twinkle, on_off) {
         assertTrue(test_controller.pixels[i].brightness == 0);
         assertTrue(0 == test_controller.strip.getPixelColor(8));
     }
-    
+
     assertTrue(0 == test_pir.lastMotionDetected);
     // Trigger on using PIR sensor
     test_pir.getReading = mockActivePinF;
@@ -94,7 +94,7 @@ testF(PIR_transform_no_twinkle, on_off) {
     delay(2000);
     // Stop reading active pin.
     test_pir.getReading = getReadingFromPin;
-    
+
     const int secondsLapsedSinceLastReading = (millis() - test_pir.lastMotionDetected) / 1000;
     assertMore(secondsLapsedSinceLastReading, test_pir.timeoutInSeconds);
 
@@ -153,7 +153,7 @@ testF(PIR_transform_twinkle, on_off) {
         assertTrue(test_controller.pixels[i].brightness == 0);
         assertTrue(0 == test_controller.strip.getPixelColor(8));
     }
-    
+
     assertTrue(0 == test_pir.lastMotionDetected);
     // Trigger on using PIR sensor
     test_pir.getReading = mockActivePinF;
@@ -188,7 +188,7 @@ testF(PIR_transform_twinkle, on_off) {
     delay(2000);
     // Stop reading active pin.
     test_pir.getReading = getReadingFromPin;
-    
+
     const int secondsLapsedSinceLastReading = (millis() - test_pir.lastMotionDetected) / 1000;
     assertMore(secondsLapsedSinceLastReading, test_pir.timeoutInSeconds);
 
@@ -249,7 +249,7 @@ testF(PIR_no_transform_no_twinkle, on_off) {
         assertTrue(test_controller.pixels[i].brightness == 0);
         assertTrue(0 == test_controller.strip.getPixelColor(8));
     }
-    
+
     assertTrue(0 == test_pir.lastMotionDetected);
     // Trigger on using PIR sensor
     test_pir.getReading = mockActivePinF;
@@ -284,7 +284,7 @@ testF(PIR_no_transform_no_twinkle, on_off) {
     delay(2000);
     // Stop reading active pin.
     test_pir.getReading = getReadingFromPin;
-    
+
     const int secondsLapsedSinceLastReading = (millis() - test_pir.lastMotionDetected) / 1000;
     assertMore(secondsLapsedSinceLastReading, test_pir.timeoutInSeconds);
 

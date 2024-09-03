@@ -249,14 +249,14 @@ protected:
 
 testF(ControllerRGBs, getNeoPixelControllerState) {
     /* DuplexMessenger::getNeoPixelControllerState should return a string
-    representation of the controller's state with the current palette
-    appended. */
+    representation of the controller's state with the current palette appended. */
 
     /* Ascending bit order
        controller->on
        controller->twinkle
-       controller->transform */
-    const String boolByte = "7";
+       controller->transform
+       controller->allTwinkleColorsAreCurrent */
+    const String boolByte = "15";
 
     const String ms = "4";
     const String brightness = "255";
@@ -268,6 +268,70 @@ testF(ControllerRGBs, getNeoPixelControllerState) {
         palette;
     const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
     assertEqual(result, expectedResult);
+}
+
+testF(ControllerRGBs, getNeoPixelControllerState__allTwinkleColorsAreCurrent_1_color_mismatch) {
+    /*DuplexMessenger::getNeoPixelControllerState boolByte value should still have a true
+    allTwinkleColorsAreCurrent value when transform is true, despite the first pixel's
+    color not matching its colorIndex color.*/
+    test_controller.pixels[0].r = 0;
+    /* Ascending bit order
+       controller->on
+       controller->twinkle
+       controller->transform
+       controller->allTwinkleColorsAreCurrent */
+    const String boolByte = "15";
+    const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
+    assertEqual(result[0], boolByte);
+}
+
+testF(ControllerRGBs, getNeoPixelControllerState__allTwinkleColorsAreCurrent_1_color_mismatch_no_transform) {
+    /*DuplexMessenger::getNeoPixelControllerState boolByte value should have a false
+    allTwinkleColorsAreCurrent value when transform is off, even though the first pixel's
+    color does not match its colorIndex color.*/
+    test_controller.transform = false;
+    test_controller.pixels[0].r = 0;
+    /* Ascending bit order
+    o  controller->on
+    o  controller->twinkle
+    x  controller->transform
+    x  controller->allTwinkleColorsAreCurrent */
+    const String boolByte = "3";
+    const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
+    assertEqual(result[0], boolByte);
+}
+
+testF(ControllerRGBs, getNeoPixelControllerState__allTwinkleColorsAreCurrent_1_color_mismatch_no_twinkle) {
+    /*DuplexMessenger::getNeoPixelControllerState boolByte value should have a false
+    allTwinkleColorsAreCurrent value when twinkle is off.*/
+    test_controller.twinkle = false;
+    // First pixel color does not match its colorIndex color to demonstrate that color is ignored.
+    test_controller.pixels[0].r = 0;
+    /* Ascending bit order
+    o  controller->on
+    x  controller->twinkle
+    o  controller->transform
+    x  controller->allTwinkleColorsAreCurrent */
+    const String boolByte = "5";
+    const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
+    assertEqual(result[0], boolByte);
+}
+
+testF(ControllerRGBs, getNeoPixelControllerState__allTwinkleColorsAreCurrent_1_color_mismatch_no_transform_no_twinkle) {
+    /*DuplexMessenger::getNeoPixelControllerState boolByte value should have a false
+    allTwinkleColorsAreCurrent value when transform and twinkle are off.*/
+    test_controller.transform = false;
+    test_controller.twinkle = false;
+    // First pixel color does not match its colorIndex color to demonstrate that color is ignored.
+    test_controller.pixels[0].r = 0;
+    /* Ascending bit order
+    o  controller->on
+    x  controller->twinkle
+    x  controller->transform
+    x  controller->allTwinkleColorsAreCurrent */
+    const String boolByte = "1";
+    const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
+    assertEqual(result[0], boolByte);
 }
 
 

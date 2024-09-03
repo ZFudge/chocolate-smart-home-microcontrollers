@@ -17,7 +17,7 @@ class PIRReader : public PIRSensor {
 public:
     // pir needs to read/write the corresponding neo pixel controller's
     // ALL_PIXELS_BRIGHTNESS_ARE_CURRENT value inside motionDetected and
-    // getCurrentSensorReading. 
+    // getCurrentSensorReading.
     NeoPixelController* neo_pixel_controller = NULL;
     bool motionDetected();
     bool getCurrentSensorReading();
@@ -37,7 +37,7 @@ int numOfPixels = 0;
 int maxCount = 50;
 bool on = true;
 bool pirIsOn() {
-    // Check any PIR sensor readings 
+    // Check any PIR sensor readings
     return pir != NULL && pir->motionDetected();
 };
 bool isOn() {

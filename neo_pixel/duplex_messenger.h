@@ -3,14 +3,34 @@
 
 #include "controller.h"
 
+
+bool allTwinkleColorsAreCurrent(NeoPixel::NeoPixelController *controller) {
+    /*Returns false if controller is only in twinkle mode and not all pixels'
+    rgb values match their corresponding colorIndex color; true otherwise.*/
+    if (!controller->twinkle || controller->transform)
+        return true;
+
+    for (int i = 0; i < controller->numOfPixels; i++) {
+        Pixel *pixel = &controller->pixels[i];
+
+        if ((byte)pixel->r != rgbs[pixel->colorIndex][0] ||
+            (byte)pixel->g != rgbs[pixel->colorIndex][1] ||
+            (byte)pixel->b != rgbs[pixel->colorIndex][2])
+            return false;
+    }
+    return true;
+}
+
+
 namespace DuplexMessenger {
 
 
 String getNeoPixelControllerState(NeoPixel::NeoPixelController *controller) {
     /* Return the controller's state in a format expected by the CSM server */
     const byte boolsByte = byte(controller->on) |
-                           byte(controller->twinkle)   << 1 |
-                           byte(controller->transform) << 2;
+                           byte(controller->twinkle)            << 1 |
+                           byte(controller->transform)          << 2 |
+                           byte(allTwinkleColorsAreCurrent(controller)) << 3;
 
     return String(boolsByte) + "," +
            String(controller->ms) + "," +

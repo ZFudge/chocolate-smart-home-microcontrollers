@@ -286,6 +286,37 @@ test(setMaxCount) {
 }
 
 
+class NeoPixelMaxCountHighNeoPixelCount: public aunit::TestOnce {
+protected:
+    NeoPixelController test_controller;
+    void setup() override {
+        aunit::TestOnce::setup();
+        test_controller.setMaxCount(75);
+        test_controller.init(TEST_DATA_PIN, 300);
+    }
+};
+
+testF(NeoPixelMaxCountHighNeoPixelCount, strip_numOfPixels) {
+    assertEqual(300, test_controller.strip.numPixels());
+}
+
+testF(NeoPixelMaxCountHighNeoPixelCount, colors_match) {
+    // assertEqual(300, test_controller.strip.numPixels());
+    // Test RGB values on strip NeoPixel.
+    uint32_t pixelColor;
+
+    for (byte l = 0; l < 4; l++) {
+        test_controller.loop();
+        for (int i = 0; i < test_controller.maxCount; i++) {
+            pixelColor = test_controller.strip.getPixelColor(i);
+            assertEqual(pixelColor, test_controller.strip.getPixelColor(i + 75));
+            assertEqual(pixelColor, test_controller.strip.getPixelColor(i + 150));
+            assertEqual(pixelColor, test_controller.strip.getPixelColor(i + 225));
+        }
+    }
+}
+
+
 void setup() {
     Serial.begin(115200);
 #if defined(EPOXY_DUINO)

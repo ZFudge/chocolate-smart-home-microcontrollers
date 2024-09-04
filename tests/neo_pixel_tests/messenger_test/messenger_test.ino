@@ -72,50 +72,57 @@ testF(ControllerProcessMsg, getByteValueUsingKey_transform_false) {
 }
 // getByteValueUsingKey end
 
-// processNeoPixelMsg start
 testF(ControllerProcessMsg, processNeoPixelMsg_on) {
+    /*processNeoPixelMsg should use the incoming message to set controller.on to true.*/
     const String incomingMessage = "on=1;";
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertTrue(test_controller.on);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_off) {
+    /*processNeoPixelMsg should use the incoming message to set controller.on to false.*/
     const String incomingMessage = "on=0;";
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertFalse(test_controller.on);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_ms) {
+    /*processNeoPixelMsg should use the incoming message to set controller.ms to 5.*/
     const String incomingMessage = "ms=5;";
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertEqual(test_controller.ms, 5);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_brightness) {
+    /*processNeoPixelMsg should use the incoming message to set controller.brightness to 123.*/
     const String incomingMessage = "brightness=123;";
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertEqual(test_controller.brightness, 123);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_twinkle_true) {
+    /*processNeoPixelMsg should use the incoming message to set controller.twinkle to true.*/
     const String incomingMessage = "twinkle=1;";
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertTrue(test_controller.twinkle);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_twinkle_false) {
+    /*processNeoPixelMsg should use the incoming message to set controller.twinkle to false.*/
     const String incomingMessage = "twinkle=0;";
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertFalse(test_controller.twinkle);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_transform_true) {
+    /*processNeoPixelMsg should use the incoming message to set controller.transform to true.*/
     const String incomingMessage = "transform=1;";
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertTrue(test_controller.transform);
 }
 
 testF(ControllerProcessMsg, processNeoPixelMsg_transform_false) {
+    /*processNeoPixelMsg should use the incoming message to set controller.transform to false.*/
     const String incomingMessage = "transform=0;";
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertFalse(test_controller.transform);
@@ -207,15 +214,17 @@ testF(ControllerProcessMsg, processNeoPixelMsg_all) {
     assertEqual(rgbs[8][2], 255);
 
 }
-// processNeoPixelMsg end
 
 
 class ControllerRGBs: public aunit::TestOnce {
 protected:
     NeoPixelController test_controller;
+    PIRReader test_pir;
     void setup() override {
         aunit::TestOnce::setup();
         test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+        test_pir.init(TEST_PIR_PIN);
+        bindNPCToPIR(&test_controller, &test_pir);
         test_controller.setMS(4);
         rgbs[0][0] = 9;
         rgbs[0][1] = 10;
@@ -248,90 +257,140 @@ protected:
 };
 
 testF(ControllerRGBs, getNeoPixelControllerState) {
-    /* DuplexMessenger::getNeoPixelControllerState should return a string
+    /* getNeoPixelControllerState should return a string
     representation of the controller's state with the current palette appended. */
 
     /* Ascending bit order
        controller->on
        controller->twinkle
        controller->transform
-       controller->allTwinkleColorsAreCurrent */
-    const String boolByte = "15";
-
+       controller->allTwinkleColorsAreCurrent
+       controller->pir
+       controller->pir->timeoutInSeconds */
+    const String boolByte = "63";
     const String ms = "4";
     const String brightness = "255";
+    const String pirTimeout = "150";
     const String palette = "9,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,255";
     const String expectedResult =
         boolByte + "," +
         ms + "," +
         brightness + "," +
+        pirTimeout + "," +
         palette;
     const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
-    assertEqual(result, expectedResult);
+    assertStringCaseEqual(result, expectedResult);
+}
+
+testF(ControllerRGBs, getNeoPixelControllerState__pir_timeoutInSeconds) {
+    /*getNeoPixelControllerState should return a string that includes the
+    pir.timeoutInSeconds value at the expected position. */
+
+    test_controller.pir->setTimeoutInSeconds(98);
+    const String boolByte = "63,";
+    const String ms = "4,";
+    const String brightness = "255,";
+    const String pirTimeout = "98,";
+    const String expectedResult = boolByte + ms + brightness + pirTimeout;
+    const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
+    assertStringCaseEqual(result.substring(0, 12), expectedResult);
+}
+
+testF(ControllerRGBs, getNeoPixelControllerState__no_pir) {
+    /*getNeoPixelControllerState should return a byte value without the pir and pir.armed bits set.*/
+    test_controller.pir = NULL;
+    /* Ascending bit order
+    x  controller->on
+    x  controller->twinkle
+    x  controller->transform
+    x  controller->allTwinkleColorsAreCurrent
+       controller->pir
+       controller->pir->armed */
+    const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
+    assertStringCaseEqual(result.substring(0, 2), "15");
+}
+
+testF(ControllerRGBs, getNeoPixelControllerState__pir_armed) {
+    /*getNeoPixelControllerState should return a byte value with the pir bit set and pir.armed bit not set.*/
+    test_controller.pir->arm(0);
+    /* Ascending bit order
+    x  controller->on
+    x  controller->twinkle
+    x  controller->transform
+    x  controller->allTwinkleColorsAreCurrent
+    x  controller->pir
+       controller->pir->armed */
+    const String boolByte = "31";
+    const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
+    assertStringCaseEqual(result.substring(0, 2), boolByte);
 }
 
 testF(ControllerRGBs, getNeoPixelControllerState__allTwinkleColorsAreCurrent_1_color_mismatch) {
-    /*DuplexMessenger::getNeoPixelControllerState boolByte value should still have a true
-    allTwinkleColorsAreCurrent value when transform is true, despite the first pixel's
-    color not matching its colorIndex color.*/
+    /*getNeoPixelControllerState should return a byte value with the allTwinkleColorsAreCurrent
+    bit set, despite the first pixel's color not matching its colorIndex color.*/
     test_controller.pixels[0].r = 0;
     /* Ascending bit order
        controller->on
        controller->twinkle
        controller->transform
-       controller->allTwinkleColorsAreCurrent */
-    const String boolByte = "15";
+       controller->allTwinkleColorsAreCurrent
+       controller->pir
+       controller->pir->timeoutInSeconds */
+    const String boolByte = "63";
     const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
-    assertEqual(result[0], boolByte);
+    assertStringCaseEqual(result.substring(0, 2), boolByte);
 }
 
 testF(ControllerRGBs, getNeoPixelControllerState__allTwinkleColorsAreCurrent_1_color_mismatch_no_transform) {
-    /*DuplexMessenger::getNeoPixelControllerState boolByte value should have a false
-    allTwinkleColorsAreCurrent value when transform is off, even though the first pixel's
-    color does not match its colorIndex color.*/
+    /*getNeoPixelControllerState should return a byte value with the allTwinkleColorsAreCurrent bit
+    set when transform is off, even though the first pixel's color does not match its colorIndex color.*/
     test_controller.transform = false;
     test_controller.pixels[0].r = 0;
     /* Ascending bit order
-    o  controller->on
-    o  controller->twinkle
-    x  controller->transform
-    x  controller->allTwinkleColorsAreCurrent */
-    const String boolByte = "3";
+    x  controller->on
+    x  controller->twinkle
+       controller->transform
+    x  controller->allTwinkleColorsAreCurrent
+    x  controller->pir
+    x  controller->pir->armed */
+    const String boolByte = "51";
     const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
-    assertEqual(result[0], boolByte);
+    assertStringCaseEqual(result.substring(0, 2), boolByte);
 }
 
 testF(ControllerRGBs, getNeoPixelControllerState__allTwinkleColorsAreCurrent_1_color_mismatch_no_twinkle) {
-    /*DuplexMessenger::getNeoPixelControllerState boolByte value should have a false
-    allTwinkleColorsAreCurrent value when twinkle is off.*/
+    /*getNeoPixelControllerState should return a byte value with the allTwinkleColorsAreCurrent bit not set when twinkle is off.*/
     test_controller.twinkle = false;
     // First pixel color does not match its colorIndex color to demonstrate that color is ignored.
     test_controller.pixels[0].r = 0;
     /* Ascending bit order
-    o  controller->on
-    x  controller->twinkle
-    o  controller->transform
-    x  controller->allTwinkleColorsAreCurrent */
-    const String boolByte = "5";
+    x  controller->on
+       controller->twinkle
+    x  controller->transform
+    x  controller->allTwinkleColorsAreCurrent
+    x  controller->pir
+    x  controller->pir->timeoutInSeconds */
+    const String boolByte = "61";
     const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
-    assertEqual(result[0], boolByte);
+    assertStringCaseEqual(result.substring(0, 2), boolByte);
 }
 
 testF(ControllerRGBs, getNeoPixelControllerState__allTwinkleColorsAreCurrent_1_color_mismatch_no_transform_no_twinkle) {
-    /*DuplexMessenger::getNeoPixelControllerState boolByte value should have a false
-    allTwinkleColorsAreCurrent value when transform and twinkle are off.*/
+    /*getNeoPixelControllerState should return a byte value with the allTwinkleColorsAreCurrent bit set when transform and twinkle are off.*/
     test_controller.transform = false;
     test_controller.twinkle = false;
     // First pixel color does not match its colorIndex color to demonstrate that color is ignored.
     test_controller.pixels[0].r = 0;
     /* Ascending bit order
-    o  controller->on
-    x  controller->twinkle
-    x  controller->transform
-    x  controller->allTwinkleColorsAreCurrent */
-    const String boolByte = "1";
+    x  controller->on
+       controller->twinkle
+       controller->transform
+    x  controller->allTwinkleColorsAreCurrent
+    x  controller->pir
+    x  controller->pir->armed */
+    const String boolByte = "57";
     const String result = DuplexMessenger::getNeoPixelControllerState(&test_controller);
-    assertEqual(result[0], boolByte);
+    assertStringCaseEqual(result.substring(0, 2), boolByte);
 }
 
 
@@ -371,23 +430,27 @@ protected:
 };
 
 testF(RGBs, getCsvRGBs) {
+    /*getCsvRGBs should returned the current color palette as the expected string.*/
     const String expectedResult = "0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,255";
-    assertEqual(getCsvRGBs(), expectedResult);
+    assertStringCaseEqual(getCsvRGBs(), expectedResult);
 }
 
 testF(ControllerProcessMsg, pir_armed_true) {
+    /*processNeoPixelMsg should use the incoming message to set controller.pir.armed to true.*/
     const String incomingMessage = "pir_armed=1;";
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertTrue(test_controller.pir->armed);
 }
 
 testF(ControllerProcessMsg, pir_armed_false) {
+    /*processNeoPixelMsg should use the incoming message to set controller.pir.armed to false.*/
     const String incomingMessage = "pir_armed=0;";
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertFalse(test_controller.pir->armed);
 }
 
 testF(ControllerProcessMsg, pir_timeout) {
+    /*processNeoPixelMsg should use the incoming message to set controller.pir.timeoutInSeconds value to 255, and subsequently, 123, 10, and 1.*/
     String incomingMessage = "pir_timeout=255;";
     DuplexMessenger::processNeoPixelMsg(incomingMessage, &test_controller);
     assertEqual(test_controller.pir->timeoutInSeconds, 255);

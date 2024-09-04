@@ -17,7 +17,7 @@ void arm(const bool armed) {
     this->armed = armed;
 }
 
-byte timeoutInSeconds = 60;
+byte timeoutInSeconds = 150;
 long lastMotionDetected = 0;
 
 bool (*getReading)(const byte) = getReadingFromPin;

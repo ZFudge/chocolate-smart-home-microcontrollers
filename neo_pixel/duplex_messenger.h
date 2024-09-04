@@ -27,15 +27,20 @@ namespace DuplexMessenger {
 
 String getNeoPixelControllerState(NeoPixel::NeoPixelController *controller) {
     /* Return the controller's state in a format expected by the CSM server */
-    const byte boolsByte = byte(controller->on) |
-                           byte(controller->twinkle)            << 1 |
-                           byte(controller->transform)          << 2 |
-                           byte(allTwinkleColorsAreCurrent(controller)) << 3;
+    const byte boolsByte =
+        byte(controller->on)                                              |
+        byte(controller->twinkle)                                    << 1 |
+        byte(controller->transform)                                  << 2 |
+        byte(allTwinkleColorsAreCurrent(controller))                 << 3 |
+        byte(controller->pir != NULL)                                << 4 |
+        byte(controller->pir == NULL ? 0 : controller->pir->armed)   << 5;
 
-    return String(boolsByte) + "," +
-           String(controller->ms) + "," +
-           String(controller->brightness) + "," +
-           getCsvRGBs();
+    return
+        String(boolsByte) + "," +
+        String(controller->ms) + "," +
+        String(controller->brightness) + "," +
+        String(controller->pir == NULL ? 0 : controller->pir->timeoutInSeconds) + "," +
+        getCsvRGBs();
 }
 
 

@@ -569,8 +569,6 @@ testF(Simultaneous, interactions) {
 
 void setup() {
     Serial.begin(115200);
-    aunit::TestRunner::exclude("*");
-    aunit::TestRunner::include("Simultaneous*");
 #if defined(EPOXY_DUINO)
     Serial.setLineModeUnix();
 #endif

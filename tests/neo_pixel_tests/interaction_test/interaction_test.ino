@@ -563,7 +563,201 @@ testF(Simultaneous, interactions) {
     test_controller.setBrightness(4);
     assertFalse(test_controller.on);
     assertEqual(test_controller.brightness, 222);
+}
 
+
+class Simultaneous2: public aunit::TestOnce, public TestNeoPixelController {};
+
+testF(Simultaneous2, simultaneous_transition__on_tw_tr__off_no_tr) {
+    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+    test_controller_loop_n_times(255);
+
+    DuplexMessenger::processNeoPixelMsg("on=0;transform=0", &test_controller);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    test_controller_loop_n_times(255);
+
+    for (byte i = 0; i < TEST_NUM_PIX; i++) {
+        assertEqual(test_controller.pixels[i].brightness, 0);
+        assertEqual(test_controller.strip.getPixelColor(i), (u_int32_t)0);
+    }
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+}
+
+testF(Simultaneous2, simultaneous_transition__on_tw_tr__off_no_tw) {
+    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+    test_controller_loop_n_times(255);
+
+    DuplexMessenger::processNeoPixelMsg("on=0;twinkle=0", &test_controller);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    test_controller_loop_n_times(255);
+
+    for (byte i = 0; i < TEST_NUM_PIX; i++) {
+        assertEqual(test_controller.pixels[i].brightness, 0);
+        assertEqual(test_controller.strip.getPixelColor(i), (u_int32_t)0);
+    }
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+}
+
+testF(Simultaneous2, simultaneous_transition__on_tw_tr__off_no_tw_no_tr) {
+    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+    test_controller_loop_n_times(255);
+
+    DuplexMessenger::processNeoPixelMsg("on=0;twinkle=0;transform=0;", &test_controller);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    test_controller_loop_n_times(255);
+
+    for (byte i = 0; i < TEST_NUM_PIX; i++) {
+        assertEqual(test_controller.pixels[i].brightness, 0);
+        assertEqual(test_controller.strip.getPixelColor(i), (u_int32_t)0);
+    }
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+}
+
+testF(Simultaneous2, simultaneous_transition__on_no_tw_tr__off_no_tw_no_tr) {
+    test_controller.setTwinkle(0);
+    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+    test_controller_loop_n_times(512);
+
+    DuplexMessenger::processNeoPixelMsg("on=0;transform=0;", &test_controller);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    test_controller_loop_n_times(255);
+
+    for (byte i = 0; i < TEST_NUM_PIX; i++) {
+        assertEqual(test_controller.pixels[i].brightness, 0);
+        assertEqual(test_controller.strip.getPixelColor(i), (u_int32_t)0);
+    }
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+}
+
+testF(Simultaneous2, simultaneous_transition__on_tw_no_tr__off_no_tw_no_tr) {
+    test_controller.setTransform(0);
+    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+    test_controller_loop_n_times(512);
+
+    DuplexMessenger::processNeoPixelMsg("on=0;twinkle=0;", &test_controller);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    test_controller_loop_n_times(255);
+
+    for (byte i = 0; i < TEST_NUM_PIX; i++) {
+        assertEqual(test_controller.pixels[i].brightness, 0);
+        assertEqual(test_controller.strip.getPixelColor(i), (u_int32_t)0);
+    }
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+}
+
+
+testF(Simultaneous2, simultaneous_transition__on_tw_no_tr__off_tr) {
+    test_controller.setTransform(0);
+    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+    test_controller_loop_n_times(255);
+
+    DuplexMessenger::processNeoPixelMsg("on=0;transform=1", &test_controller);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    test_controller_loop_n_times(255);
+
+    for (byte i = 0; i < TEST_NUM_PIX; i++) {
+        assertEqual(test_controller.pixels[i].brightness, 0);
+        assertEqual(test_controller.strip.getPixelColor(i), (u_int32_t)0);
+    }
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+}
+
+testF(Simultaneous2, simultaneous_transition__on_tr_no_tw__off_tw) {
+    test_controller.setTwinkle(0);
+    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+    test_controller_loop_n_times(255);
+
+    DuplexMessenger::processNeoPixelMsg("on=0;twinkle=1", &test_controller);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    test_controller_loop_n_times(255);
+
+    for (byte i = 0; i < TEST_NUM_PIX; i++) {
+        assertEqual(test_controller.pixels[i].brightness, 0);
+        assertEqual(test_controller.strip.getPixelColor(i), (u_int32_t)0);
+    }
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+}
+
+testF(Simultaneous2, simultaneous_transition__on_no_tw_no_tr__off_tw_tr) {
+    test_controller.setTwinkle(0);
+    test_controller.setTransform(0);
+    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+    test_controller_loop_n_times(255);
+
+    DuplexMessenger::processNeoPixelMsg("on=0;twinkle=1;transform=1;", &test_controller);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    test_controller_loop_n_times(255);
+
+    for (byte i = 0; i < TEST_NUM_PIX; i++) {
+        assertEqual(test_controller.pixels[i].brightness, 0);
+        assertEqual(test_controller.strip.getPixelColor(i), (u_int32_t)0);
+    }
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+}
+
+testF(Simultaneous2, simultaneous_transition__on_no_tw_no_tr__off_no_tw_tr) {
+    test_controller.setTwinkle(0);
+    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+    test_controller_loop_n_times(512);
+
+    DuplexMessenger::processNeoPixelMsg("on=0;transform=1;", &test_controller);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    test_controller_loop_n_times(255);
+
+    for (byte i = 0; i < TEST_NUM_PIX; i++) {
+        assertEqual(test_controller.pixels[i].brightness, 0);
+        assertEqual(test_controller.strip.getPixelColor(i), (u_int32_t)0);
+    }
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+}
+
+testF(Simultaneous2, simultaneous_transition__on_no_tw_no_tr__off_tw_no_tr) {
+    test_controller.setTransform(0);
+    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+    test_controller_loop_n_times(512);
+
+    DuplexMessenger::processNeoPixelMsg("on=0;twinkle=1;", &test_controller);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    test_controller_loop_n_times(255);
+
+    for (byte i = 0; i < TEST_NUM_PIX; i++) {
+        assertEqual(test_controller.pixels[i].brightness, 0);
+        assertEqual(test_controller.strip.getPixelColor(i), (u_int32_t)0);
+    }
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+}
+
+
+testF(Simultaneous2, simultaneous_transition__on_tw_no_tr__off_no_tw_tr) {
+    test_controller.setTransform(0);
+    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+    test_controller_loop_n_times(512);
+
+    DuplexMessenger::processNeoPixelMsg("on=0;twinkle=0;transform=1;", &test_controller);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    test_controller_loop_n_times(255);
+
+    for (byte i = 0; i < TEST_NUM_PIX; i++) {
+        assertEqual(test_controller.pixels[i].brightness, 0);
+        assertEqual(test_controller.strip.getPixelColor(i), (u_int32_t)0);
+    }
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+}
+
+testF(Simultaneous2, simultaneous_transition__on_no_tw_tr__off_tw_no_tr) {
+    test_controller.setTwinkle(0);
+    test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+    test_controller_loop_n_times(512);
+
+    DuplexMessenger::processNeoPixelMsg("on=0;twinkle=1;transform=0;", &test_controller);
+    assertFalse(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
+    test_controller_loop_n_times(255);
+
+    for (byte i = 0; i < TEST_NUM_PIX; i++) {
+        assertEqual(test_controller.pixels[i].brightness, 0);
+        assertEqual(test_controller.strip.getPixelColor(i), (u_int32_t)0);
+    }
+    assertTrue(test_controller.ALL_PIXELS_BRIGHTNESS_ARE_CURRENT);
 }
 
 

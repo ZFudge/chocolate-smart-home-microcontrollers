@@ -125,7 +125,6 @@ void loop() {
                 ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
         }
     }
-    this->strip.show();
 
     if (!transform) {
         /* Either the controller is on but twinkle and transform are both off
@@ -134,8 +133,8 @@ void loop() {
         if (!twinkle || (twinkle && !isOn())) {
             if (!ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT) {
                 settleAnyTransforms();
-                this->strip.show();
             }
+            this->strip.show();
             return;
         }
     }

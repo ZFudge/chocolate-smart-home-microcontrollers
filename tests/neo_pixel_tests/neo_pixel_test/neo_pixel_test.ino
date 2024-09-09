@@ -317,6 +317,63 @@ testF(NeoPixelMaxCountHighNeoPixelCount, colors_match) {
 }
 
 
+class RGBsController: public aunit::TestOnce {
+protected:
+    NeoPixelController test_controller;
+    void setup() override {
+        aunit::TestOnce::setup();
+        rgbs[0][0] = 0;
+        rgbs[0][1] = 0;
+        rgbs[0][2] = 0;
+        rgbs[1][0] = 0;
+        rgbs[1][1] = 0;
+        rgbs[1][2] = 0;
+        rgbs[2][0] = 0;
+        rgbs[2][1] = 0;
+        rgbs[2][2] = 0;
+        rgbs[3][0] = 0;
+        rgbs[3][1] = 0;
+        rgbs[3][2] = 0;
+        rgbs[4][0] = 0;
+        rgbs[4][1] = 0;
+        rgbs[4][2] = 0;
+        rgbs[5][0] = 0;
+        rgbs[5][1] = 0;
+        rgbs[5][2] = 0;
+        rgbs[6][0] = 0;
+        rgbs[6][1] = 0;
+        rgbs[6][2] = 0;
+        rgbs[7][0] = 0;
+        rgbs[7][1] = 0;
+        rgbs[7][2] = 0;
+        rgbs[8][0] = 0;
+        rgbs[8][1] = 0;
+        rgbs[8][2] = 0;
+        test_controller.twinkle = false;
+        test_controller.transform = false;
+        test_controller.init(TEST_DATA_PIN, TEST_NUM_PIX);
+        for (int i = 0; i < TEST_NUM_PIX; i++) {
+            test_controller.pixels[i].r = 0;
+            test_controller.pixels[i].g = 0;
+            test_controller.pixels[i].b = 0;
+        }
+    }
+};
+
+testF(RGBsController, test_controller_updateRGBs__no_twinkle_no_transform) {
+    for (int i = 0; i < 255; i++)
+        test_controller.loop();
+
+    test_controller.updateRGBs("33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33");
+
+    for (int i = 0; i < 200; i++)
+        test_controller.loop();
+
+    for (int i = 0; i < TEST_NUM_PIX; i++)
+        assertEqual(test_controller.strip.getPixelColor(i), (uint32_t)2171169);
+}
+
+
 void setup() {
     Serial.begin(115200);
 #if defined(EPOXY_DUINO)

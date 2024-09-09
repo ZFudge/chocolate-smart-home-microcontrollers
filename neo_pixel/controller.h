@@ -125,14 +125,17 @@ void loop() {
                 ALL_PIXELS_BRIGHTNESS_ARE_CURRENT = true;
         }
     }
+    this->strip.show();
 
     if (!transform) {
         /* Either the controller is on but twinkle and transform are both off
             OR
             controller is dimming and twinkling doesn't apply. */
         if (!twinkle || (twinkle && !isOn())) {
-            if (!ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT)
+            if (!ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT) {
                 settleAnyTransforms();
+                this->strip.show();
+            }
             return;
         }
     }
@@ -278,6 +281,7 @@ void updateRGBs(String csvPalette) {
                 // graceful way to
                 pixel->transformStepsRemaining = 200;
                 pixel->setNewTransformTargetFromCurrentState();
+                ALL_PIXELS_TRANSFORM_CYCLES_ARE_CURRENT = false;
             }
         } else {
             pixel->setRGBFromIndex();

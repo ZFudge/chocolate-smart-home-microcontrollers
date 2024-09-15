@@ -29,10 +29,6 @@ void processMsg(String message) {
 
 void setup() {
     Serial.begin(115200);
-    pinMode(LED_WIFI, OUTPUT);
-    pinMode(LED_MQTT, OUTPUT);
-    digitalWrite(LED_WIFI, LOW);
-    digitalWrite(LED_MQTT, LOW);
 
     // np_controller.setMaxCount(25);
     // np_controller.init(DATA_PIN, NUM_PIX, NEO_GRB + NEO_KHZ800);
@@ -48,6 +44,8 @@ void setup() {
     // Configure controller.
     CsmEspConn::controller.setMQTTId(MQTT_ID);
     CsmEspConn::controller.setType(CONTROLLER_TYPE);
+    CsmEspConn::controller.setWIFILed(LED_WIFI);
+    CsmEspConn::controller.setMQTTLed(LED_MQTT);
     CsmEspConn::controller.init(NAME);
 
     CsmEspConn::set_mqtt_server_host_and_port(MQTT_SERVER, MQTT_PORT);
